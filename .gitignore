@@ -1,0 +1,8 @@
+# ignore .sln .vcxproj xcode files
+solutions/
+out/
+obj/
+.vs/
+.vscode/
+include/rapidjson/
+include/uuidv4/

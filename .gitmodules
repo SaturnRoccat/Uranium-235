@@ -1,0 +1,9 @@
+[submodule "include/rapidjson"]
+	path = include/rapidjson
+	url = https://github.com/Tencent/rapidjson.git
+[submodule "include/uuidv4"]
+	path = include/uuidv4
+	url = https://github.com/crashoz/uuid_v4.git
+[submodule "include/stb"]
+	path = include/stb
+	url = https://github.com/nothings/stb.git
