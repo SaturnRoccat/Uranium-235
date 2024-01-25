@@ -52,6 +52,7 @@ namespace Uranium
 		{
 			Info,
 			Warning,
+			Debug,
 			Error // Treat all errors as fatal
 		};
 
@@ -99,6 +100,8 @@ namespace Uranium
 				return getColorCode(color::YELLOW);
 			case LogLevel::Error:
 				return getColorCode(color::RED);
+			case LogLevel::Debug:
+				return getColorCode(color::GREEN);
 			default:
 				return getColorCode(color::RESET);
 			}
@@ -140,6 +143,9 @@ namespace Uranium
 					break;
 				case LogLevel::Error:
 					levelString = "Error";
+					break;
+				case LogLevel::Debug:
+					levelString = "Debug";
 					break;
 				default:
 					levelString = "Unknown";
@@ -186,6 +192,12 @@ namespace Uranium
 				LogRaw(LogLevel::Info, message, args...);
 			}
 
+			template <typename... Args>
+			static void inline Debug(const std::string& message, Args... args)
+			{
+				LogRaw(LogLevel::Info, message, args...);
+			}
+
 			static void inline Error(const std::string& message)
 			{
 				LogRaw(LogLevel::Error, message);
@@ -205,6 +217,10 @@ namespace Uranium
 				LogRaw(LogLevel::Info, message);
 			}
 
+			static void inline Debug(const std::string& message)
+			{
+				LogRaw(LogLevel::Info, message);
+			}
 
 			static void inline flush(bool staticFlush = false)
 			{
