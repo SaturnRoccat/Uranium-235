@@ -56,8 +56,7 @@ namespace Uranium::Events
 	{
 	public:
 		Event(const std::string& name) : m_eventIdentifier(name) {};
-
-		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) = 0;
+		virtual void cleanUp() {};
 	public:
 		std::string m_eventIdentifier;
 	};
@@ -70,6 +69,7 @@ namespace Uranium::Events
 		void AddEventComponent(Components::Events::EventComponent* const component) { m_eventComponents.push_back(component); };
 
 		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override; 
+
 	private:
 		std::vector<Components::Events::EventComponent*> m_eventComponents;
 	};
