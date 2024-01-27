@@ -57,6 +57,8 @@ namespace Uranium::Events
 	public:
 		Event(const std::string& name) : m_eventIdentifier(name) {};
 		virtual void cleanUp() {};
+
+		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) = 0;
 	public:
 		std::string m_eventIdentifier;
 	};
