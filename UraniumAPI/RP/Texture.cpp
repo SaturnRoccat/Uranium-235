@@ -100,7 +100,7 @@ namespace Uranium
         {
             for (size_t j = 0; j < m_height; j++)
             {
-                float distance = sqrt(pow(i - x1, 2) + pow(j - y1, 2)) + sqrt(pow(i - x2, 2) + pow(j - y2, 2));
+                float distance = (float)sqrt(pow(i - x1, 2) + pow(j - y1, 2)) + sqrt(pow(i - x2, 2) + pow(j - y2, 2));
                 if (distance <= sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2)))
                 {
 					SetPixel(i, j, color);

@@ -12,12 +12,13 @@
 #include "../Component/BlockComponents/BlockComponent.hpp"
 #include "BlockStates.hpp"
 #include "Permutations/Permutation.hpp"
+#include "../Events/Event.hpp"
 
-namespace Uranium
+namespace Uranium::Blocks
 {
     struct BlockMenuCategory
     {
-        Catagories::Catagory category;
+        Catagories::Catagory category = Catagories::Catagory::none;
         ItemGroups::ItemGroup itemGroup = ItemGroups::ItemGroup::NUL;
         bool isHiddenInCommands = false;
     };
@@ -28,7 +29,8 @@ namespace Uranium
 
         Block(
             const char* displayName,
-            const char* identifierIn
+            const char* identifierIn,
+            Version formatVersion
         ) 
         {
             std::string identifier = identifierIn;
@@ -39,6 +41,8 @@ namespace Uranium
             }
             m_displayName = displayName;
 			m_name = identifier;
+            m_formatVersion = formatVersion;
+
         };
 
         std::string GetDisplayName() const { return m_displayName; }
@@ -47,16 +51,17 @@ namespace Uranium
         void setCategoryData(const BlockMenuCategory& categoryData) { m_categoryData = categoryData; }
         BlockMenuCategory getCategoryData() const { return m_categoryData; }
         void addComponent(Components::BlockComponent* component) { m_components.push_back(component); }
-        void addBlockState(BlockState* blockState);
+        void addBlockState(States::BlockState* blockState);
         void addPermutation(const Permutation& permutation) { m_permutations.push_back(permutation); }
+        void addEvent(Events::Event* event) { m_events.push_back(event); }
 
         void compileBlock(
-            NonOwningPointer<ProjectSettings> projectSettings,
+            ProjectSettings* projectSettings,
             rapidjson::Document* endJson
 
-        ); // TODO: Implement this
+        );
         void SetTexture(const BlockTexture& texture) { m_texture = texture; };
-        void SetGeometry(class Geometry* geometry) { m_textureMetadata.SetCustomModel(geometry); };
+        //void SetGeometry(class Geometry* geometry) { m_textureMetadata.SetCustomModel(geometry); };
         BlockTextureMetadata GetTextureMetadata() const { return m_textureMetadata; }
     private:
         void recursiveCompile(
@@ -73,16 +78,23 @@ namespace Uranium
             NonOwningPointer<ProjectSettings> projectSettings,
             RapidProxy::DefaultValueWriter writer
         );
+
+        void recursiveCompileEvents(
+			NonOwningPointer<ProjectSettings> projectSettings,
+			RapidProxy::DefaultValueWriter writer
+		);
     private:
         std::string m_displayName;
         std::string m_name;
         std::string m_texturePath;
-        BlockTextureMetadata m_textureMetadata;
         BlockTexture m_texture;
-        BlockMenuCategory m_categoryData;
+        BlockTextureMetadata m_textureMetadata;
         std::vector<Components::BlockComponent*> m_components;
-        std::vector<BlockState*> m_blockStates;
+        std::vector<States::BlockState*> m_blockStates;
         std::vector<Permutation> m_permutations;
-        
+        std::vector<Events::Event*> m_events;
+        Version m_formatVersion;
+        BlockMenuCategory m_categoryData;
+
     };
 }

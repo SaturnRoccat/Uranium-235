@@ -5,7 +5,7 @@
 namespace Uranium::Catagories
 {
     static const std::array<std::string, 5> catagories = { "construction", "equipment", "items", "nature", "none" };
-    enum class Catagory
+    enum class Catagory: unsigned char
     {
         construction = 0,
         equipment = 1,

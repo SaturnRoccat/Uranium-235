@@ -10,12 +10,13 @@ namespace Uranium
 		class Component
 		{
 		public:
-			Component(const std::string& name, const std::vector<Experimentals>& reqiredExperiments = {}) : m_name(name), m_reqiredExperiments(reqiredExperiments) {}
+			Component(const char* name) : m_name(name) {}
 
-			virtual void CompileComponent(RapidProxy::DefaultValueWriter ValueWriter, ProjectSettings* settings) = 0;
+			virtual void CompileComponent(RapidProxy::DefaultValueWriter writer, ProjectSettings* settings) = 0;
+
+			const char* GetName() const { return m_name; }
 		private:
-			std::string m_name;
-			std::vector<Experimentals> m_reqiredExperiments;
+			const char* m_name;
 		};
 	}
 }

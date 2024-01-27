@@ -2,6 +2,8 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <uuidv4/uuid_v4.h>
+#include <format>
 
 namespace Uranium
 {
@@ -28,7 +30,7 @@ namespace Uranium
 		uint8_t major, minor, patch;
 	};
 
-	enum class Experimentals
+	enum class Experimentals : unsigned char
 	{
 		HolidayCreatorFeatures,
 		CustomBiomes,
@@ -37,6 +39,8 @@ namespace Uranium
 		MoLangFeatures = 8,
 		ExperimentalCameras = 16,
 		VillagerTradeRebalancing = 32,
+		UraniumExperimentalAPIs = 64, // This isnt an actual experimental we can add to the manifest, but this should allow us to add experimental APIs to Uranium and just hope lmao
+		ALL = 0xFF // Used as a hacky way to get all experimentals
 	};
 
 	class ProjectSettings
@@ -48,24 +52,32 @@ namespace Uranium
 			const std::string& description = "A Uranium Project",
 			const std::string& author = "Uranium",
 			const std::string& outputLocation = "UraniumOut/",
+			const std::string& namespace_ = "uranium",
 			const std::vector<std::pair<Experimentals, bool>>& experimentals = {}
 		)
-			: version(version), name(name), description(description), author(author), experimentals(experimentals)
+			: version(version), name(name), description(description), author(author), experimentals(experimentals), namespace_(namespace_)
 		{
+			(void)gen.getUUID(); // Cycles the generator to initialize it
 		}
 
 		const std::string getNameWithNamespace(const std::string& Name) const
 		{
-			return name + ":" + Name;
+			return std::format("{}:{}", namespace_, Name);
 		}
 
+		UUIDv4::UUIDGenerator<std::mt19937_64>* getUUID() 
+		{
+			return &gen;
+		}
 
 	public:
+		std::string namespace_;
 		Version version;
 		std::string name;
 		std::string description;
 		std::string author;
 		std::vector<std::pair<Experimentals, bool>> experimentals;
 		std::string outputLocation;
+		UUIDv4::UUIDGenerator<std::mt19937_64> gen;
 	};
 }

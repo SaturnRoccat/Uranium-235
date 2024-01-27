@@ -1,5 +1,5 @@
 #include "ProjectConfig.hpp"
-
+#include <format>
 
 namespace Uranium
 {
@@ -10,7 +10,7 @@ namespace Uranium
 
 	std::string Version::ToString() const
 	{
-		return std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(patch);
+		return std::format("{}.{}.{}", major, minor, patch);
 	}
 
 	bool Version::operator==(const Version& other) const

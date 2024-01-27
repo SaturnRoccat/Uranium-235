@@ -25,7 +25,7 @@ namespace Uranium
 
 
 	private:
-		bool m_usesCustomModel = false;
 		class Geometry* m_geometry = nullptr;
+		bool m_usesCustomModel = false;
 	};
 }

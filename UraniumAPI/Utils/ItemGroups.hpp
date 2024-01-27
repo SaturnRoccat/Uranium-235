@@ -124,7 +124,8 @@ namespace Uranium::ItemGroups
 		"itemGroup.name.composter",
 		"itemGroup.name.chiseledBookshelf"
 	};
-	enum class ItemGroup {
+	enum class ItemGroup : unsigned char 
+	{
 		planks = 0,
 		walls = 1,
 		fence = 2,
@@ -246,6 +247,11 @@ namespace Uranium::ItemGroups
 		CUSTOM = 118, // This theorectically should never be used, but it is here just in case. i ever stop working on this project and someone else is using it.
 		NUL = 119 // This is used for when the item group is not set.
 	};
+
+	static std::string itemGroupToString(ItemGroup itemGroup)
+	{
+		return ItemGroupNames[static_cast<int>(itemGroup)];
+	}
 }
         
     

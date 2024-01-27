@@ -34,9 +34,13 @@ namespace Uranium
 		bool operator==(T* other) const { return m_Ptr == other; }
 		bool operator!=(T* other) const { return m_Ptr != other; }
 
+		// Disable the delete operator
+		void operator delete(void* ptr) {}
+
 		operator bool() const { return m_Ptr; }
 
 		T* Get() const { return m_Ptr; }
+		void Set(T* ptr) { m_Ptr = ptr; }
 
 		
 	private:

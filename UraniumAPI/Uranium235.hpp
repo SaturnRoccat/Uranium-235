@@ -14,10 +14,13 @@ namespace Uranium
 		ProjectSettings* m_ProjectSettings;
 		TextureRegistery m_TextureRegistery;
 	private:
+	private:
 	public:
 		Uranium235(
 			ProjectSettings* projectSettings
 		);
+
+		ProjectSettings* getProjectSettings() const { return m_ProjectSettings; }
 
 		~Uranium235()
 		{

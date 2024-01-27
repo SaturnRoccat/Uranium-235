@@ -53,7 +53,8 @@ namespace Uranium
 			Info,
 			Warning,
 			Debug,
-			Error // Treat all errors as fatal
+			Error, 
+			NonFatalError
 		};
 
 		enum class color
@@ -102,6 +103,8 @@ namespace Uranium
 				return getColorCode(color::RED);
 			case LogLevel::Debug:
 				return getColorCode(color::GREEN);
+			case LogLevel::NonFatalError:
+				return getColorCode(color::MAGENTA);
 			default:
 				return getColorCode(color::RESET);
 			}
@@ -140,6 +143,9 @@ namespace Uranium
 					break;
 				case LogLevel::Warning:
 					levelString = "Warning";
+					break;
+				case LogLevel::NonFatalError:
+					levelString = "NonFatalError";
 					break;
 				case LogLevel::Error:
 					levelString = "Error";
@@ -195,7 +201,13 @@ namespace Uranium
 			template <typename... Args>
 			static void inline Debug(const std::string& message, Args... args)
 			{
-				LogRaw(LogLevel::Info, message, args...);
+				LogRaw(LogLevel::Debug, message, args...);
+			}
+
+			template<typename ... Args>
+			static void inline NonFatalError(const std::string& message, Args... args)
+			{
+				LogRaw(LogLevel::NonFatalError, message, args...);
 			}
 
 			static void inline Error(const std::string& message)
@@ -219,7 +231,12 @@ namespace Uranium
 
 			static void inline Debug(const std::string& message)
 			{
-				LogRaw(LogLevel::Info, message);
+				LogRaw(LogLevel::Debug, message);
+			}
+
+			static void inline NonFatalError(const std::string& message)
+			{
+				LogRaw(LogLevel::NonFatalError, message);
 			}
 
 			static void inline flush(bool staticFlush = false)

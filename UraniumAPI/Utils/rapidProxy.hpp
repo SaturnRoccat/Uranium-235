@@ -6,6 +6,7 @@
 #pragma warning(disable : 4267)
 #pragma warning(disable : 26451)
 #pragma warning(disable : 26495)
+#pragma warning(disable : 33010)
 #include <rapidjson/include/rapidjson/document.h>
 #include <rapidjson/include/rapidjson/istreamwrapper.h>
 #include <rapidjson/include/rapidjson/ostreamwrapper.h>
@@ -15,6 +16,7 @@
 #pragma warning(default : 4996)
 #pragma warning(default : 4267)
 #pragma warning(default : 26495)
+#pragma warning(default : 33010)
 
 namespace RapidProxy
 {
@@ -29,8 +31,9 @@ namespace RapidProxy
 	typedef DataWriter<rapidjson::Value, rapidjson::MemoryPoolAllocator<>> DefaultValueWriter;
 	typedef DataWriter<rapidjson::Document, rapidjson::MemoryPoolAllocator<>> DocumentWriter;
 
+}
 
-	// Pulls the data and allocator from the writer into a variable called data and allocator
+// Pulls the data and allocator from the writer into a variable called data and allocator
 #define DVAP() \
 rapidjson::Value* data = (rapidjson::Value*)writer.data; \
 rapidjson::MemoryPoolAllocator<>& allocator = writer.allocator;
@@ -40,7 +43,7 @@ rapidjson::MemoryPoolAllocator<>& allocator = writer.allocator;
 rapidjson::Document* data = (rapidjson::Document*)writer.data; \
 rapidjson::MemoryPoolAllocator<>& allocator = writer.allocator;
 
-#define RJ_STL_S(str) rapidjson::StringRef(str.c_str(), str.size())
+#define RJ_STL_S(str) rapidjson::StringRef(str.c_str(), str.length())
 
 #define RJ_STL_V_A(name, x)\
 rapidjson::Value name(rapidjson::kArrayType);\
@@ -71,4 +74,9 @@ name.Reserve(x.size(), allocator);\
 for (auto& i : x) {\
 	name.PushBack(ConvertionCall(i), allocator);\
 }
-}
+
+#define RJ_SAFE_STL_S(str)\
+char* str## __LINE__ = (char*)malloc(str.length() + 1 * sizeof(char));\
+strcpy_s(str## __LINE__ , str.length() + 1, str.c_str());\
+rapidjson::Value str##Cstr;\
+str##Cstr.SetString(str## __LINE__ , str.length(), allocator);

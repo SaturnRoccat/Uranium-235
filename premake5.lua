@@ -53,6 +53,9 @@ project "Uranium_235_tester"
 
     links { "Uranium_235" }
 
+    -- force uranium_235 to allways build first
+    dependson { "Uranium_235" }
+
     platforms { "x86_64" } -- Screw 32 bit
 
     filter "configurations:Debug"

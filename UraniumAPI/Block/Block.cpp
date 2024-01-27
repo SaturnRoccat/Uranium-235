@@ -1,6 +1,6 @@
 #include "Block.hpp"
-
-void Uranium::Block::addBlockState(BlockState* blockState)
+#include "../Utils/macros.hpp"
+void Uranium::Blocks::Block::addBlockState(States::BlockState* blockState)
 {
 	size_t permutationCount = blockState->GetPermutationSize();
 	for (auto state : this->m_blockStates)
@@ -13,19 +13,38 @@ void Uranium::Block::addBlockState(BlockState* blockState)
 
 }
 
-void Uranium::Block::compileBlock(NonOwningPointer<ProjectSettings> projectSettings, rapidjson::Document* endJson)
+void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapidjson::Document* endJson)
 {
 	// Sets up the json
 	endJson->SetObject();
 	rapidjson::Document::AllocatorType& allocator = endJson->GetAllocator();
-	endJson->AddMember("format_version", RJ_STL_S(projectSettings.Get()->version.ToString()), allocator);
+	auto str = m_formatVersion.ToString();
+	endJson->AddMember("format_version", rapidjson::StringRef(str.c_str(), str.length()), allocator);
 
 	rapidjson::Value blockObj(rapidjson::kObjectType);
 	blockObj.AddMember("description", rapidjson::Value(rapidjson::kObjectType), allocator);
 	rapidjson::Value& description = blockObj["description"];
 
-	description.AddMember("identifier", RJ_STL_S(projectSettings.Get()->getNameWithNamespace(this->m_name)), allocator);
+	auto NameWithNamespace = projectSettings->getNameWithNamespace(this->m_name);
+	description.AddMember("identifier", rapidjson::StringRef(NameWithNamespace.c_str(), NameWithNamespace.length()), allocator);
 	description.AddMember("menu_catagory", rapidjson::Value(rapidjson::kObjectType), allocator);
+
+	if (this->m_categoryData.category != Catagories::Catagory::none)
+	{
+		rapidjson::Value& menuCategory = description["menu_catagory"];
+		auto catData = Catagories::catagoryToString(this->m_categoryData.category);
+		RJ_SAFE_STL_S(catData)
+		menuCategory.AddMember("category", catDataCstr, allocator);
+		if (this->m_categoryData.itemGroup != ItemGroups::ItemGroup::NUL)
+		{
+			auto itemGroup = ItemGroups::itemGroupToString(this->m_categoryData.itemGroup);
+			RJ_SAFE_STL_S(itemGroup)
+			menuCategory.AddMember("group", itemGroupCstr, allocator);
+		}
+		if (this->m_categoryData.isHiddenInCommands)
+			menuCategory.AddMember("is_hidden_in_commands", true, allocator);
+
+	}
 
 	blockObj.AddMember("components", rapidjson::Value(rapidjson::kObjectType), allocator);
 	rapidjson::Value& components = blockObj["components"];
@@ -46,21 +65,46 @@ void Uranium::Block::compileBlock(NonOwningPointer<ProjectSettings> projectSetti
 		this->recursiveCompilePermutations(projectSettings, RapidProxy::DefaultValueWriter(&permutations, allocator));
 	}
 
+	if (this->m_events.size() > 0)
+	{
+		this->recursiveCompileEvents(projectSettings, {&blockObj, allocator});
+	}
+
 	this->recursiveCompile(projectSettings, RapidProxy::DefaultValueWriter(&components, allocator));
 
 
 	endJson->AddMember("minecraft:block", blockObj, allocator);
+
+	DEBUGCODE(
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+		endJson->Accept(writer);
+		Logs::Logger::Debug("Block JSON: {}", buffer.GetString());
+	)
 }
 
-void Uranium::Block::recursiveCompile(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
+void Uranium::Blocks::Block::recursiveCompile(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
 {
+	// Compute enabled experiments
+	unsigned char enabledExperiments = 0;
+	for (auto exp : projectSettings.Get()->experimentals)
+		enabledExperiments |= (unsigned char)exp.first;
+
 	for (auto comp : this->m_components)
 	{
+#ifndef BYPASSCHECKS
+		if ((comp->GetReqiredExperimentsBitfield() & enabledExperiments) != comp->GetReqiredExperimentsBitfield())
+		{
+			Logs::Logger::NonFatalError("Component {} requires experiments that are not enabled!", comp->GetName());
+			continue;
+		}
+#endif //BYPASSCHECKS
+
 		comp->CompileComponent(writer, projectSettings);
 	}
 }
 
-void Uranium::Block::recursiveCompileStates(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
+void Uranium::Blocks::Block::recursiveCompileStates(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
 {
 	for (auto state : this->m_blockStates)
 	{
@@ -68,7 +112,7 @@ void Uranium::Block::recursiveCompileStates(NonOwningPointer<ProjectSettings> pr
 	}
 }
 
-void Uranium::Block::recursiveCompilePermutations(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
+void Uranium::Blocks::Block::recursiveCompilePermutations(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
 {
 	DVAP()
 	for (auto permutation : this->m_permutations)
@@ -76,4 +120,15 @@ void Uranium::Block::recursiveCompilePermutations(NonOwningPointer<ProjectSettin
 		rapidjson::Value permutationData = permutation.compilePermutation(allocator, projectSettings);
 		data->PushBack(permutationData, allocator);
 	}
+}
+
+void Uranium::Blocks::Block::recursiveCompileEvents(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
+{
+	DVAP()
+	rapidjson::Value events(rapidjson::kObjectType);
+	for (auto e : this->m_events)
+	{
+		e->CompileEvent({ &events, allocator });
+	}
+	data->AddMember("events", events, allocator);
 }

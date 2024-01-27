@@ -4,7 +4,7 @@
 #include <vector>
 #pragma warning(disable : 4267)
 
-namespace Uranium
+namespace Uranium::Blocks::States
 {
 	class BlockState
 	{
