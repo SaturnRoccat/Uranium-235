@@ -110,10 +110,11 @@ namespace Uranium::Events
 	class EventPart
 	{
 	public:
-		EventPart(EventDataPair& const dataPair) : eventSequencePart(dataPair) {}
-		EventPart(
-			FixedResponseEvent* event)
-			: eventSequencePart(event) {}
+		EventPart(EventDataPair& dataPair)
+			: eventSequencePart(dataPair) {}
+
+		EventPart(FixedResponseEvent<T>* evnt)
+			: eventSequencePart(evnt) {}
 	public:
 		std::variant<EventDataPair, FixedResponseEvent<T>*> eventSequencePart;
 	};
@@ -122,18 +123,18 @@ namespace Uranium::Events
 	class SequencedEvent : public Event
 	{
 	public:
-		template<IsEventComponent T>
-		class SequencedEventPart : protected EventPart {
+		template<IsEventComponent U>
+		class SequencedEventPart : protected EventPart<U> {
 		public:
-			SequencedEventPart(EventDataPair<T>* dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair* dataPair, const char* const condition = "")
 				: EventPart(*dataPair), condition(condition) {
 				delete dataPair;
 			}
-			SequencedEventPart(EventDataPair<T>& dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair& dataPair, const char* const condition = "")
 				: EventPart(dataPair), condition(condition) {
 			}
 
-			SequencedEventPart(FixedResponseEvent<T>* const event, const char* condition)
+			SequencedEventPart(FixedResponseEvent<U>* const event, const char* condition)
 				: EventPart(event), condition(condition) {}
 
 			void CompileEventSequencePart(RapidProxy::DefaultValueWriter writer)
@@ -149,7 +150,7 @@ namespace Uranium::Events
 
 				if (std::holds_alternative<FixedResponseEvent*>(this->eventSequencePart))
 				{
-					FixedResponseEvent* e = std::get<FixedResponseEvent*>(this->eventSequencePart);
+					FixedResponseEvent<U>* e = std::get<FixedResponseEvent<U>*>(this->eventSequencePart);
 					e->CompileEvent(writer);
 				}
 				else // This is the brach i REALLY dont wanna implement cuz its painful
@@ -193,25 +194,25 @@ namespace Uranium::Events
 			data->AddMember("sequence", sequenceArray, allocator);
 		}
 	private:
-		std::vector<SequencedEventPart> m_eventSequence;
+		std::vector<SequencedEventPart<T>> m_eventSequence;
 	};
 
 	template<IsEventComponent T>
 	class RandomEvent : public Event
 	{
 	public:
-		template<IsEventComponent T>
-		class EventChancePart : private EventPart
+		template<IsEventComponent U>
+		class EventChancePart : private EventPart<U>
 		{
 		public:
 			EventChancePart(
 				size_t weight,
-				const EventPart& eventPartData)
+				const EventPart<U>& eventPartData)
 				: weight(weight), EventPart(eventPartData) {}
 
 			EventChancePart(
 				size_t weight,
-				FixedResponseEvent* event)
+				FixedResponseEvent<U>* event)
 				: weight(weight), EventPart(event) {}
 
 
@@ -220,9 +221,9 @@ namespace Uranium::Events
 				// Pulls down the data and allocator
 				DVAP()
 					data->AddMember("weight", this->weight, allocator);
-				if (std::holds_alternative<FixedResponseEvent*>(this->eventSequencePart))
+				if (std::holds_alternative<FixedResponseEvent<U>*>(this->eventSequencePart))
 				{
-					FixedResponseEvent* e = std::get<FixedResponseEvent*>(this->eventSequencePart);
+					FixedResponseEvent* e = std::get<FixedResponseEvent<U>*>(this->eventSequencePart);
 					e->CompileEvent(writer);
 				}
 				else // This is the brach i REALLY dont wanna implement cuz its painful
@@ -244,8 +245,8 @@ namespace Uranium::Events
 	public:
 		RandomEvent(const std::string& name) : Event(name) {};
 
-		void AddEventChancePart(EventChancePart& part) { m_eventChance.push_back(part); };
-		void AddEventChancePart(EventChancePart* const part) { m_eventChance.push_back(*part); delete part; };
+		void AddEventChancePart(EventChancePart<T>& part) { m_eventChance.push_back(part); };
+		void AddEventChancePart(EventChancePart<T>* const part) { m_eventChance.push_back(*part); delete part; };
 
 		// Allows the user to decide whether or not the event should be deleted after being added to the event
 
@@ -263,7 +264,7 @@ namespace Uranium::Events
 			data->AddMember("randomize", sequenceArray, allocator);
 		}
 	private:
-		std::vector<EventChancePart> m_eventChance;
+		std::vector<EventChancePart<T>> m_eventChance;
 	};
 }
 #pragma warning(default: 6387)
