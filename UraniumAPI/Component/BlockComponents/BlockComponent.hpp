@@ -1,7 +1,7 @@
 #pragma once
 #include "../Component.hpp"
 
-namespace Uranium::Components 
+namespace Uranium::Components::Blocks
 {
 
     // Just a base class for all block components to inherit from just searving as a way to group them together

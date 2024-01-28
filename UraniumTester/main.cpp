@@ -35,14 +35,14 @@ int main()
         });
 
     block->addComponent(
-        new Uranium::Components::TestBlockComponent()
+        new Uranium::Components::Blocks::TestBlockComponent()
     );
 
     block->addPermutation(
         Uranium::Blocks::Permutation(
             "thing",
             {
-                new Uranium::Components::TestBlockComponent2()
+                new Uranium::Components::Blocks::TestBlockComponent2()
             }
         )
     );
