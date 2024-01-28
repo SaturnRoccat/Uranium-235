@@ -47,38 +47,6 @@ int main()
         )
     );
 
-    Uranium::Events::FixedResponseEvent* eventOne =
-        new Uranium::Events::FixedResponseEvent(
-            "uranium:testingEventOne"
-        );
-    eventOne->AddEventComponent(
-        new Uranium::Components::Events::TestEventComponentOne()
-    );
-
-    block->addEvent(eventOne);
-
-    Uranium::Events::SequencedEvent* eventTwo = new Uranium::Events::SequencedEvent(
-        "uranium:testingEventTwo"
-    );
-    
-    eventTwo->AddEventSequencePart(
-        new Uranium::Events::SequencedEvent::SequencedEventPart(
-            new Uranium::Events::EventDataPair(
-                "self",
-                "uranium:testingEventOne"
-            )
-        )
-    );
-    eventTwo->AddEventSequencePart(
-        new Uranium::Events::SequencedEvent::SequencedEventPart(
-            new Uranium::Events::EventDataPair(
-                "self",
-                "uranium:testingEventThree"
-            )
-        )
-    );
-    block->addEvent(eventTwo);
-
     rapidjson::Document json;
     block->compileBlock(uranium->getProjectSettings(), &json);
     
