@@ -13,6 +13,7 @@
 #include "BlockStates.hpp"
 #include "Permutations/Permutation.hpp"
 #include "../Events/Event.hpp"
+#include "../Utils/macros.hpp"
 
 namespace Uranium::Blocks
 {
@@ -30,7 +31,7 @@ namespace Uranium::Blocks
         Block(
             const char* displayName,
             const char* identifierIn,
-            Version formatVersion
+            Version formatVersion = LATEST_FORMAT_VERSION
         ) 
         {
             std::string identifier = identifierIn;
@@ -50,7 +51,7 @@ namespace Uranium::Blocks
 
         void setCategoryData(const BlockMenuCategory& categoryData) { m_categoryData = categoryData; }
         BlockMenuCategory getCategoryData() const { return m_categoryData; }
-        void addComponent(Components::BlockComponent* component) { m_components.push_back(component); }
+        void addComponent(Components::Blocks::BlockComponent* component) { m_components.push_back(component); }
         void addBlockState(States::BlockState* blockState);
         void addPermutation(const Permutation& permutation) { m_permutations.push_back(permutation); }
         void addEvent(Events::Event* event) { m_events.push_back(event); }
@@ -89,7 +90,7 @@ namespace Uranium::Blocks
         std::string m_texturePath;
         BlockTexture m_texture;
         BlockTextureMetadata m_textureMetadata;
-        std::vector<Components::BlockComponent*> m_components;
+        std::vector<Components::Blocks::BlockComponent*> m_components;
         std::vector<States::BlockState*> m_blockStates;
         std::vector<Permutation> m_permutations;
         std::vector<Events::Event*> m_events;
