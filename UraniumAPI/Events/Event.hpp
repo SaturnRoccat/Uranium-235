@@ -4,6 +4,7 @@
 #include "../Component/EventComponent/EventComponent.hpp"
 #include <vector>
 #include <variant>
+#include <type_traits>
 /*
 * What are you doing in this file?
 * This file is a mess
@@ -49,9 +50,12 @@
 * 
 * 
 */
+#pragma warning(disable: 4267)
+#pragma warning(disable: 6387)
 namespace Uranium::Events
 {
-
+	template<typename T>
+	concept IsEventComponent = std::is_base_of<Components::Events::EventComponent, T>::value;
 	class Event
 	{
 	public:
@@ -63,6 +67,7 @@ namespace Uranium::Events
 		std::string m_eventIdentifier;
 	};
 
+	template<IsEventComponent T>
 	class FixedResponseEvent : public Event
 	{
 		public:
@@ -70,10 +75,22 @@ namespace Uranium::Events
 
 		void AddEventComponent(Components::Events::EventComponent* const component) { m_eventComponents.push_back(component); };
 
-		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override; 
+		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override
+		{
+			// Pulls down the data and allocator
+			DVAP()
+
+				rapidjson::Value eventObject(rapidjson::kObjectType);
+
+			for (auto& e : this->m_eventComponents)
+				e->CompileComponent({ &eventObject, allocator });
+
+			RJ_SAFE_STL_S(m_eventIdentifier)
+				data->AddMember(m_eventIdentifierCstr, eventObject, allocator);
+		}
 
 	private:
-		std::vector<Components::Events::EventComponent*> m_eventComponents;
+		std::vector<T*> m_eventComponents;
 	};
 
 	class EventDataPair {
@@ -89,6 +106,7 @@ namespace Uranium::Events
 		std::string eventID;
 	};
 
+	template<IsEventComponent T>
 	class EventPart
 	{
 	public:
@@ -97,26 +115,56 @@ namespace Uranium::Events
 			FixedResponseEvent* event)
 			: eventSequencePart(event) {}
 	public:
-		std::variant<EventDataPair, FixedResponseEvent*> eventSequencePart;
+		std::variant<EventDataPair, FixedResponseEvent<T>*> eventSequencePart;
 	};
 
+	template<IsEventComponent T>
 	class SequencedEvent : public Event
 	{
 	public:
+		template<IsEventComponent T>
 		class SequencedEventPart : protected EventPart {
 		public:
-			SequencedEventPart(EventDataPair* dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair<T>* dataPair, const char* const condition = "")
 				: EventPart(*dataPair), condition(condition) {
 				delete dataPair;
 			}
-			SequencedEventPart(EventDataPair& dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair<T>& dataPair, const char* const condition = "")
 				: EventPart(dataPair), condition(condition) {
 			}
 
-			SequencedEventPart(FixedResponseEvent* const event, const char* condition)
+			SequencedEventPart(FixedResponseEvent<T>* const event, const char* condition)
 				: EventPart(event), condition(condition) {}
 
-			void CompileEventSequencePart(RapidProxy::DefaultValueWriter writer);
+			void CompileEventSequencePart(RapidProxy::DefaultValueWriter writer)
+			{
+				// Pulls down the data and allocator
+				DVAP()
+					if (this->condition != "")
+					{
+						auto conditionStr = this->condition;
+						RJ_SAFE_STL_S(conditionStr)
+							data->AddMember("condition", conditionStrCstr, allocator);
+					}
+
+				if (std::holds_alternative<FixedResponseEvent*>(this->eventSequencePart))
+				{
+					FixedResponseEvent* e = std::get<FixedResponseEvent*>(this->eventSequencePart);
+					e->CompileEvent(writer);
+				}
+				else // This is the brach i REALLY dont wanna implement cuz its painful
+				{
+					EventDataPair e = std::get<EventDataPair>(this->eventSequencePart);
+					rapidjson::Value triggerObject(rapidjson::kObjectType);
+					auto targetStr = e.GetTarget();
+					RJ_SAFE_STL_S(targetStr)
+						triggerObject.AddMember("target", targetStrCstr, allocator);
+					auto eventStr = e.GetEventID();
+					RJ_SAFE_STL_S(eventStr)
+						triggerObject.AddMember("event", eventStrCstr, allocator);
+					data->AddMember("trigger", triggerObject, allocator);
+				}
+			}
 
 		private:
 			std::string condition;
@@ -124,20 +172,35 @@ namespace Uranium::Events
 	public:
 		SequencedEvent(const std::string& name) : Event(name) {};
 
-		void AddEventSequencePart(SequencedEventPart& const part) { m_eventSequence.push_back(part); };
-		void AddEventSequencePart(SequencedEventPart* const part) { 
+		void AddEventSequencePart(SequencedEventPart<T>& const part) { m_eventSequence.push_back(part); };
+		void AddEventSequencePart(SequencedEventPart<T>* const part) { 
 			m_eventSequence.push_back(*part); 
 			delete part;
 		};
 
-		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override;
+		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override
+		{
+			// Pulls down the data and allocator
+			DVAP()
+				rapidjson::Value sequenceArray(rapidjson::kArrayType);
+
+			for (auto& e : this->m_eventSequence)
+			{
+				rapidjson::Value sequenceStep(rapidjson::kObjectType);
+				e.CompileEventSequencePart({ &sequenceStep, allocator });
+				sequenceArray.PushBack(sequenceStep, allocator);
+			}
+			data->AddMember("sequence", sequenceArray, allocator);
+		}
 	private:
 		std::vector<SequencedEventPart> m_eventSequence;
 	};
 
+	template<IsEventComponent T>
 	class RandomEvent : public Event
 	{
 	public:
+		template<IsEventComponent T>
 		class EventChancePart : private EventPart
 		{
 		public:
@@ -152,7 +215,29 @@ namespace Uranium::Events
 				: weight(weight), EventPart(event) {}
 
 
-			void CompileEventChancePart(RapidProxy::DefaultValueWriter writer);
+			void CompileEventChancePart(RapidProxy::DefaultValueWriter writer)
+			{
+				// Pulls down the data and allocator
+				DVAP()
+					data->AddMember("weight", this->weight, allocator);
+				if (std::holds_alternative<FixedResponseEvent*>(this->eventSequencePart))
+				{
+					FixedResponseEvent* e = std::get<FixedResponseEvent*>(this->eventSequencePart);
+					e->CompileEvent(writer);
+				}
+				else // This is the brach i REALLY dont wanna implement cuz its painful
+				{
+					EventDataPair e = std::get<EventDataPair>(this->eventSequencePart);
+					rapidjson::Value triggerObject(rapidjson::kObjectType);
+					auto targetStr = e.GetTarget();
+					RJ_SAFE_STL_S(targetStr)
+						triggerObject.AddMember("target", targetStrCstr, allocator);
+					auto eventStr = e.GetEventID();
+					RJ_SAFE_STL_S(eventStr)
+						triggerObject.AddMember("event", eventStrCstr, allocator);
+					data->AddMember("trigger", triggerObject, allocator);
+				}
+			}
 		private:
 			size_t weight;
 		};
@@ -164,8 +249,22 @@ namespace Uranium::Events
 
 		// Allows the user to decide whether or not the event should be deleted after being added to the event
 
-		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override;
+		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) override
+		{
+			// Pulls down the data and allocator
+			DVAP()
+				rapidjson::Value sequenceArray(rapidjson::kArrayType);
+			for (auto& e : this->m_eventChance)
+			{
+				rapidjson::Value sequenceStep(rapidjson::kObjectType);
+				e.CompileEventChancePart({ &sequenceStep, allocator });
+				sequenceArray.PushBack(sequenceStep, allocator);
+			}
+			data->AddMember("randomize", sequenceArray, allocator);
+		}
 	private:
 		std::vector<EventChancePart> m_eventChance;
 	};
 }
+#pragma warning(default: 6387)
+#pragma warning(default: 4267)
