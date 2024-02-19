@@ -1,6 +1,7 @@
 #pragma once
 #include "../Utils/rapidProxy.hpp" // The fact that this file has to exist is a crime against humanity
 #include <string>
+#include "../Utils/strUtil.hpp"
 #include "../Component/EventComponent/EventComponent.hpp"
 #include <vector>
 #include <variant>
@@ -59,19 +60,19 @@ namespace Uranium::Events
 	class Event
 	{
 	public:
-		Event(const std::string& name) : m_eventIdentifier(name) {};
+		Event(CStrWithLength name) : m_eventIdentifier(name) {};
 		virtual void cleanUp() {};
 
 		virtual void CompileEvent(RapidProxy::DefaultValueWriter writer) = 0;
 	public:
-		std::string m_eventIdentifier;
+		CStrWithLength m_eventIdentifier;
 	};
 
 	template<IsEventComponent T>
 	class FixedResponseEvent : public Event
 	{
 		public:
-		FixedResponseEvent(const std::string& name) : Event(name) {};
+		FixedResponseEvent(CStrWithLength name) : Event(name) {};
 
 		void AddEventComponent(Components::Events::EventComponent* const component) { m_eventComponents.push_back(component); };
 
@@ -85,8 +86,8 @@ namespace Uranium::Events
 			for (auto& e : this->m_eventComponents)
 				e->CompileComponent({ &eventObject, allocator });
 
-			RJ_SAFE_STL_S(m_eventIdentifier)
-				data->AddMember(m_eventIdentifierCstr, eventObject, allocator);
+			
+		    data->AddMember(m_eventIdentifier, eventObject, allocator);
 		}
 
 	private:
@@ -95,15 +96,15 @@ namespace Uranium::Events
 
 	class EventDataPair {
 	public:
-		EventDataPair(const std::string& target, const std::string& eventID)
+		EventDataPair(CStrWithLength target, CStrWithLength eventID)
 			: target(target), eventID(eventID) {}
 
-		std::string& GetTarget() { return target; }
-		std::string& GetEventID() { return eventID; }
+		CStrWithLength GetTarget() { return target; }
+		CStrWithLength GetEventID() { return eventID; }
 
 	private:
-		std::string target;
-		std::string eventID;
+		CStrWithLength target;
+		CStrWithLength eventID;
 	};
 
 	template<IsEventComponent T>
@@ -126,15 +127,15 @@ namespace Uranium::Events
 		template<IsEventComponent U>
 		class SequencedEventPart : protected EventPart<U> {
 		public:
-			SequencedEventPart(EventDataPair* dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair* dataPair, CStrWithLength condition = "")
 				: EventPart(*dataPair), condition(condition) {
 				delete dataPair;
 			}
-			SequencedEventPart(EventDataPair& dataPair, const char* const condition = "")
+			SequencedEventPart(EventDataPair& dataPair, CStrWithLength condition = "")
 				: EventPart(dataPair), condition(condition) {
 			}
 
-			SequencedEventPart(FixedResponseEvent<U>* const event, const char* condition)
+			SequencedEventPart(FixedResponseEvent<U>* const event, CStrWithLength condition)
 				: EventPart(event), condition(condition) {}
 
 			void CompileEventSequencePart(RapidProxy::DefaultValueWriter writer)
@@ -143,9 +144,7 @@ namespace Uranium::Events
 				DVAP()
 					if (this->condition != "")
 					{
-						auto conditionStr = this->condition;
-						RJ_SAFE_STL_S(conditionStr)
-							data->AddMember("condition", conditionStrCstr, allocator);
+						data->AddMember("condition", condition, allocator);
 					}
 
 				if (std::holds_alternative<FixedResponseEvent*>(this->eventSequencePart))
@@ -158,20 +157,18 @@ namespace Uranium::Events
 					EventDataPair e = std::get<EventDataPair>(this->eventSequencePart);
 					rapidjson::Value triggerObject(rapidjson::kObjectType);
 					auto targetStr = e.GetTarget();
-					RJ_SAFE_STL_S(targetStr)
-						triggerObject.AddMember("target", targetStrCstr, allocator);
+				    triggerObject.AddMember("target", targetStr, allocator);
 					auto eventStr = e.GetEventID();
-					RJ_SAFE_STL_S(eventStr)
-						triggerObject.AddMember("event", eventStrCstr, allocator);
+					triggerObject.AddMember("event", eventStr, allocator);
 					data->AddMember("trigger", triggerObject, allocator);
 				}
 			}
 
 		private:
-			std::string condition;
+			CStrWithLength condition;
 		};
 	public:
-		SequencedEvent(const std::string& name) : Event(name) {};
+		SequencedEvent(CStrWithLength name) : Event(name) {};
 
 		void AddEventSequencePart(SequencedEventPart<T>& part) { m_eventSequence.push_back(part); };
 		void AddEventSequencePart(SequencedEventPart<T>* const part) { 
@@ -231,11 +228,9 @@ namespace Uranium::Events
 					EventDataPair e = std::get<EventDataPair>(this->eventSequencePart);
 					rapidjson::Value triggerObject(rapidjson::kObjectType);
 					auto targetStr = e.GetTarget();
-					RJ_SAFE_STL_S(targetStr)
-						triggerObject.AddMember("target", targetStrCstr, allocator);
+					triggerObject.AddMember("target", targetStr, allocator);
 					auto eventStr = e.GetEventID();
-					RJ_SAFE_STL_S(eventStr)
-						triggerObject.AddMember("event", eventStrCstr, allocator);
+					triggerObject.AddMember("event", eventStr, allocator);
 					data->AddMember("trigger", triggerObject, allocator);
 				}
 			}
@@ -243,7 +238,7 @@ namespace Uranium::Events
 			size_t weight;
 		};
 	public:
-		RandomEvent(const std::string& name) : Event(name) {};
+		RandomEvent(CStrWithLength name) : Event(name) {};
 
 		void AddEventChancePart(EventChancePart<T>& part) { m_eventChance.push_back(part); };
 		void AddEventChancePart(EventChancePart<T>* const part) { m_eventChance.push_back(*part); delete part; };
