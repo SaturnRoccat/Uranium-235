@@ -87,7 +87,7 @@ namespace Uranium::Blocks
     private:
         CStrWithLength m_displayName;
         CStrWithLength m_name;
-        std::string m_texturePath;
+        CStrWithLength m_texturePath;
         BlockTexture m_texture;
         BlockTextureMetadata m_textureMetadata;
         std::vector<Components::Blocks::BlockComponent*> m_components;
