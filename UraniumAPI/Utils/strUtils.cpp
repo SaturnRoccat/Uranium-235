@@ -8,9 +8,7 @@ namespace Uranium
         for (char c : str)
         {
             if (c >= 'A' && c <= 'Z')
-            {
                 return true;
-            }
         }
         return false;
     };
@@ -20,9 +18,7 @@ namespace Uranium
         for (char& c : str)
         {
             if (c >= 'A' && c <= 'Z')
-            {
                 c += 32;
-            }
         }
     };
 }
