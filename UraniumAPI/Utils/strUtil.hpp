@@ -16,6 +16,7 @@ namespace Uranium
         CStrWithLength(const char* str, unsigned long long length) : str(const_cast<char*>(str)), lengthAndAutoRelease(length) {}
         template<size_t N>
         CStrWithLength(const char(&str)[N]) : str(const_cast<char*>(str)), lengthAndAutoRelease(N) {}
+        ~CStrWithLength() { if (lengthAndAutoRelease.getBool()) delete[] str; }
         explicit CStrWithLength(const std::string& str) 
         {
             char* temp = new char[str.size()];
