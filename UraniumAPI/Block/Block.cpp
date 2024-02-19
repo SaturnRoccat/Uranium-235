@@ -3,8 +3,11 @@
 void Uranium::Blocks::Block::addBlockState(States::BlockState* blockState)
 {
 	size_t permutationCount = blockState->GetPermutationSize();
-	for (auto state : this->m_blockStates)
-		permutationCount *= state->GetPermutationSize();
+	for (auto state : this->m_blockStates) {
+		// make sure we dont test against itself
+		if (state != blockState)
+			permutationCount *= state->GetPermutationSize();
+	}
 
 	if (permutationCount > 65536)
 		Logs::Logger::Error("Too many states for block {}!", this->m_name);
