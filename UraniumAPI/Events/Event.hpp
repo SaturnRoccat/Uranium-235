@@ -98,8 +98,8 @@ namespace Uranium::Events
 		EventDataPair(const std::string& target, const std::string& eventID)
 			: target(target), eventID(eventID) {}
 
-		std::string GetTarget() const { return target; }
-		std::string GetEventID() const { return eventID; }
+		std::string& GetTarget() { return target; }
+		std::string& GetEventID() { return eventID; }
 
 	private:
 		std::string target;

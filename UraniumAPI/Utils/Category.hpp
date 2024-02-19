@@ -1,6 +1,6 @@
 #include <array>
 #include <string>
-
+#include "strUtil.hpp"
 
 namespace Uranium::Catagories
 {
@@ -16,9 +16,9 @@ namespace Uranium::Catagories
 
 
     // O(1) time complexity
-    static std::string catagoryToString(Catagory catagory)
+    static CStrWithLength catagoryToString(Catagory catagory)
     {
-        return catagories[static_cast<int>(catagory)];
+        return { catagories[static_cast<int>(catagory)].c_str(), catagories[static_cast<int>(catagory)].size() };
     }
 
     // O(n) time complexity (n = number of catagories)

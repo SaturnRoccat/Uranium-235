@@ -30,18 +30,17 @@ namespace Uranium::Blocks
 
         Block(
             const char* displayName,
-            const char* identifierIn,
+            std::string identifierIn,
             Version formatVersion = LATEST_FORMAT_VERSION
         ) 
         {
-            std::string identifier = identifierIn;
-            if (Uranium::containsUppercase(identifier))
+            if (Uranium::containsUppercase(identifierIn))
             {
                 Logs::Logger::Warning("Block identifier contains uppercase characters, this may cause issues with the game! Converting to lowercase");
-                Uranium::toLowercase(identifier);
+                Uranium::toLowercase(identifierIn);
             }
             m_displayName = displayName;
-			m_name = identifier;
+			m_name = identifierIn;
             m_formatVersion = formatVersion;
 
         };

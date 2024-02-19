@@ -36,13 +36,11 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	{
 		rapidjson::Value& menuCategory = description["menu_catagory"];
 		auto catData = Catagories::catagoryToString(this->m_categoryData.category);
-		RJ_SAFE_STL_S(catData)
-		menuCategory.AddMember("category", catDataCstr, allocator);
+		menuCategory.AddMember("category", catData.toValue(), allocator);
 		if (this->m_categoryData.itemGroup != ItemGroups::ItemGroup::NUL)
 		{
 			auto itemGroup = ItemGroups::itemGroupToString(this->m_categoryData.itemGroup);
-			RJ_SAFE_STL_S(itemGroup)
-			menuCategory.AddMember("group", itemGroupCstr, allocator);
+			menuCategory.AddMember("group", itemGroup.toValue(), allocator);
 		}
 		if (this->m_categoryData.isHiddenInCommands)
 			menuCategory.AddMember("is_hidden_in_commands", true, allocator);

@@ -1,6 +1,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include "strUtil.hpp"
 
 namespace Uranium::ItemGroups
 {
@@ -247,10 +248,9 @@ namespace Uranium::ItemGroups
 		CUSTOM = 118, // This theorectically should never be used, but it is here just in case. i ever stop working on this project and someone else is using it.
 		NUL = 119 // This is used for when the item group is not set.
 	};
-
-	static std::string itemGroupToString(ItemGroup itemGroup)
+	static CStrWithLength itemGroupToString(ItemGroup itemGroup)
 	{
-		return ItemGroupNames[static_cast<int>(itemGroup)];
+		return { ItemGroupNames[static_cast<int>(itemGroup)].c_str(), ItemGroupNames[static_cast<int>(itemGroup)].size() };
 	}
 }
         

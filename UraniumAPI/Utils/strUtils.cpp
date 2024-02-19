@@ -12,6 +12,16 @@ namespace Uranium
         }
         return false;
     };
+    bool containsUppercase(const char* str)
+    {
+        while (*str != '\0')
+        {
+			if (*str >= 'A' && *str <= 'Z')
+				return true;
+			str++;
+		}
+		return false;
+	};
 
     void toLowercase(std::string& str)
     {
@@ -21,4 +31,14 @@ namespace Uranium
                 c += 32;
         }
     };
+
+    void toLowercase(char* str)
+    {
+        while (*str != '\0')
+        {
+			if (*str >= 'A' && *str <= 'Z')
+				*str += 32;
+			str++;
+		}
+	};
 }
