@@ -2,6 +2,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include "Utils/strUtil.hpp"
 #include <uuidv4/uuid_v4.h>
 #include <format>
 
@@ -12,7 +13,7 @@ namespace Uranium
 	public:
 		Version(uint8_t major = 1, uint8_t minor = 0, uint8_t patch = 0);
 		
-		std::string ToString() const;
+		CStrWithLength ToString() const;
 
 		uint8_t GetMajor() const { return major; }
 		uint8_t GetMinor() const { return minor; }
@@ -60,9 +61,9 @@ namespace Uranium
 			(void)gen.getUUID(); // Cycles the generator to initialize it
 		}
 
-		const std::string getNameWithNamespace(const std::string& Name) const
+		const CStrWithLength getNameWithNamespace(CStrWithLength Name) const
 		{
-			return std::format("{}:{}", namespace_, Name);
+			return CStrWithLength(namespace_ + ":" + Name.toString());
 		}
 
 		UUIDv4::UUIDGenerator<std::mt19937_64>* getUUID() 

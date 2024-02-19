@@ -21,15 +21,15 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	// Sets up the json
 	endJson->SetObject();
 	rapidjson::Document::AllocatorType& allocator = endJson->GetAllocator();
-	auto str = m_formatVersion.ToString();
-	endJson->AddMember("format_version", rapidjson::StringRef(str.c_str(), str.length()), allocator);
+	CStrWithLength str = CStrWithLength(m_formatVersion.ToString());
+	endJson->AddMember("format_version", str.toValue(), allocator);
 
 	rapidjson::Value blockObj(rapidjson::kObjectType);
 	blockObj.AddMember("description", rapidjson::Value(rapidjson::kObjectType), allocator);
 	rapidjson::Value& description = blockObj["description"];
 
-	auto NameWithNamespace = projectSettings->getNameWithNamespace(this->m_name);
-	description.AddMember("identifier", rapidjson::StringRef(NameWithNamespace.c_str(), NameWithNamespace.length()), allocator);
+	CStrWithLength NameWithNamespace = projectSettings->getNameWithNamespace(this->m_name);
+	description.AddMember("identifier", NameWithNamespace.toValue(), allocator);
 	description.AddMember("menu_catagory", rapidjson::Value(rapidjson::kObjectType), allocator);
 
 	if (this->m_categoryData.category != Catagories::Catagory::none)

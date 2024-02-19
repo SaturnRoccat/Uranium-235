@@ -77,17 +77,19 @@ int main()
 	}
 
 
-    {
-        Uranium::ScopedTimer timer("File Writing.");
-        rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-        json.Accept(writer);
-        Uranium::Logs::Logger::Debug("JSON: {}", buffer.GetString());
-        // write to file
-		std::ofstream file("uranium.json");
-		file << buffer.GetString();
-		file.close();
-	}
+    DEBUGCODE(
+        {
+            Uranium::ScopedTimer timer("File Writing.");
+            rapidjson::StringBuffer buffer;
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+            json.Accept(writer);
+            Uranium::Logs::Logger::Debug("JSON: {}", buffer.GetString());
+            // write to file
+            std::ofstream file("uranium.json");
+            file << buffer.GetString();
+            file.close();
+        }
+    )
 
     {
         Uranium::ScopedTimer timer("Block Deletion.");

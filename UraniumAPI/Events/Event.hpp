@@ -173,7 +173,7 @@ namespace Uranium::Events
 	public:
 		SequencedEvent(const std::string& name) : Event(name) {};
 
-		void AddEventSequencePart(SequencedEventPart<T>& const part) { m_eventSequence.push_back(part); };
+		void AddEventSequencePart(SequencedEventPart<T>& part) { m_eventSequence.push_back(part); };
 		void AddEventSequencePart(SequencedEventPart<T>* const part) { 
 			m_eventSequence.push_back(*part); 
 			delete part;

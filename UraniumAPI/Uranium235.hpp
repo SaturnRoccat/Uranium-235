@@ -1,9 +1,12 @@
 #pragma once
 #include "Utils/rapidProxy.hpp"
 #include "RP/TextureRegistery.hpp"
+#include "Utils/strUtil.hpp"
 #include "uuidv4/uuid_v4.h"
 #include "ProjectConfig.hpp"
 #include "Block/Block.hpp"
+#include "Entity/Entity.hpp"
+#include <unordered_map>
 
 namespace Uranium
 {
@@ -14,6 +17,9 @@ namespace Uranium
 		ProjectSettings* m_ProjectSettings;
 		TextureRegistery m_TextureRegistery;
 	private:
+		std::unordered_map<CStrWithLength, Blocks::Block*, CStrWithLengthHasher> m_BlockRegistery;
+		std::unordered_map<CStrWithLength, Entities::Entity*, CStrWithLengthHasher> m_EntityRegistery;
+
 	private:
 	public:
 		Uranium235(

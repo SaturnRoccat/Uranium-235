@@ -7,6 +7,7 @@
 #include "../Utils/rapidProxy.hpp"
 #include "../Utils/Category.hpp"
 #include "../Utils/ItemGroups.hpp"
+#include "../Utils/strUtil.hpp"
 #include "../Utils/NonOwningPointer.hpp"
 #include "../ProjectConfig.hpp"
 #include "../Component/BlockComponents/BlockComponent.hpp"
@@ -29,8 +30,8 @@ namespace Uranium::Blocks
     public:
 
         Block(
-            const char* displayName,
-            std::string identifierIn,
+            CStrWithLength displayName,
+            CStrWithLength identifierIn,
             Version formatVersion = LATEST_FORMAT_VERSION
         ) 
         {
@@ -45,8 +46,8 @@ namespace Uranium::Blocks
 
         };
 
-        std::string GetDisplayName() const { return m_displayName; }
-        std::string GetName() const { return m_name; }
+        CStrWithLength GetDisplayName() const { return m_displayName; }
+        CStrWithLength GetName() const { return m_name; }
 
         void setCategoryData(const BlockMenuCategory& categoryData) { m_categoryData = categoryData; }
         BlockMenuCategory getCategoryData() const { return m_categoryData; }
@@ -84,8 +85,8 @@ namespace Uranium::Blocks
 			RapidProxy::DefaultValueWriter writer
 		);
     private:
-        std::string m_displayName;
-        std::string m_name;
+        CStrWithLength m_displayName;
+        CStrWithLength m_name;
         std::string m_texturePath;
         BlockTexture m_texture;
         BlockTextureMetadata m_textureMetadata;
