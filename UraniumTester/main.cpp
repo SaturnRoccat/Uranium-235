@@ -7,7 +7,7 @@
 Uranium::Blocks::Block* generateBlock(int index)
 {
     // "testidentifier_to_try_andbreak_mycode"
-    Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "testidentifier_to_try_andbreak_mycode", Uranium::Version(1, 20, 30));
+    Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "sso_test", Uranium::Version(1, 20, 30));
     //Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "testIdentifier_to_Try_andBreak_myCode" + index, Uranium::Version(1, 20, 30));
 
    /* block->addBlockState(
@@ -55,12 +55,12 @@ int main()
         }
     ));
 
-    const int blockCount = 10000000;
+    const int blockCount = 1;
     std::vector<Uranium::Blocks::Block*> block;
     block.reserve(blockCount);
     //Uranium::Blocks::Block* block;
     {
-        Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
+        //Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
         for (int i = 0; i < blockCount; i++)
         {
             block.push_back( generateBlock(i));

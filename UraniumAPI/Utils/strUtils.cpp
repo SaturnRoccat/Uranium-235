@@ -3,6 +3,15 @@
 
 namespace Uranium
 {
+    CStrWithLength CStrWithLength::substr(size_t start, size_t end)
+    {
+        char* newStr = new char[end - start + 1];
+        memcpy(newStr, getRawData() + start, end - start);
+        newStr[end - start] = '\0';
+        return CStrWithLength(newStr, end - start, true);
+    }
+
+
     bool containsUppercase(const std::string& str)
     {
         for (char c : str)

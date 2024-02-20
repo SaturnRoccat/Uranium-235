@@ -13,12 +13,14 @@ namespace Uranium
     {
     public:
         CStrWithLength() : str(NULL), lengthAndAutoRelease(0) {}
-        CStrWithLength(const char* str, unsigned long long length, bool autoRelease = false)
+        CStrWithLength(const char* str, unsigned long long length, bool autoRelease = true)
         {
             if (length < 15)
             {
                 lengthAndAutoRelease = pFlagMask;
-                SSOSizeAndAutoRelease = pSSOFlag | (length & pSSOSizeMask) | (autoRelease ? pLastBitMask : 0);
+                SSOSizeAndAutoRelease = pSSOFlag | (length & pSSOSizeMask);
+                if (autoRelease)
+                    SSOSizeAndAutoRelease |= pLastBitMask;
                 memcpy(SSO, str, length);
                 SSO[length] = '\0';
             }
@@ -26,30 +28,43 @@ namespace Uranium
             {
                 this->lengthAndAutoRelease.setLength(length);
                 this->lengthAndAutoRelease.setBool(autoRelease);
-                this->str = new char[length + 1];
+                char* newStr = new char[length + 1];
+                this->str = newStr;
                 memcpy(this->str, str, length);
                 this->str[length] = '\0';
             }
         }
         template<size_t N>
-        CStrWithLength(const char(&str)[N], bool autoRelease = false) : CStrWithLength(str, N - 1, autoRelease) {}
+        CStrWithLength(const char(&str)[N], bool autoRelease = true) : CStrWithLength(str, N - 1, autoRelease) {}
 
-        explicit CStrWithLength(const std::string& str) : CStrWithLength(str.c_str(), str.size(), false) {}
+        explicit CStrWithLength(const std::string& str, bool autoRelease = true) : CStrWithLength(str.c_str(), str.size(), autoRelease) {}
         CStrWithLength(CStrWithLength& other) : CStrWithLength(other.c_str(), other.size(), other.getAutoRelease()) {}
+        CStrWithLength(CStrWithLength&& other) noexcept : CStrWithLength(other.c_str(), other.size(), other.getAutoRelease()) { other.release(); }
+        CStrWithLength(const CStrWithLength& other) 
+        {
+            if (other.isSSO())
+            {
+                SSOSizeAndAutoRelease = other.SSOSizeAndAutoRelease;
+                memcpy(SSO, other.SSO, other.size());
+            }
+            else
+            {
+                char* newStr = new char[other.size() + 1];
+                memcpy(newStr, const_cast<CStrWithLength&>(other).c_str(), other.size());
+                newStr[other.size()] = '\0';
+				lengthAndAutoRelease = other.lengthAndAutoRelease;
+				str = newStr;
+            }
+        }
+
         ~CStrWithLength() { if (getAutoRelease()) release(); } 
     public:
         inline rapidjson::Value toValue() { return rapidjson::Value(getRawData(), rapidjson::SizeType(getLength())); }
         inline char* c_str() { return getRawData(); }
         inline size_t size() const { return getLength(); }
         inline void setAutoDelete(bool autoDelete) { setAutoRelease(autoDelete); }
-        inline std::string toString() { return std::string(str, getLength()); }
-        CStrWithLength substr(size_t start, size_t end) 
-        {
-            char* newStr = new char[end - start + 1];
-            memcpy(newStr, getRawData() + start, end - start);
-			newStr[end - start] = '\0';
-			return CStrWithLength(newStr, end - start, true);
-        }
+        inline std::string toString() { return std::string(getRawData(), getLength()); }
+        CStrWithLength substr(size_t start, size_t end);
         inline bool empty() const { return getLength() == 0; }
         inline void clear() {release();}
     public:
@@ -58,7 +73,7 @@ namespace Uranium
         operator size_t () { return getLength(); }
         explicit operator rapidjson::Value() { return rapidjson::Value(str, rapidjson::SizeType(getLength())); }
         operator std::string_view() { return std::string_view(str, getLength()); }
-        char& operator[](size_t index) { return str[index]; }
+        char& operator[](size_t index) { return *(getRawData() + index); }
 
         bool operator==(const char* other) const { return strcmp(getRawData(), other) == 0; }
         bool operator==(const std::string& other) { return strcmp(getRawData(), other.c_str()) == 0; }
@@ -80,6 +95,15 @@ namespace Uranium
 		CStrWithLength& operator+=(const std::string_view& other) { return *this = *this + other; }
 		CStrWithLength& operator+=(CStrWithLength& other) { return *this = *this + other; }
 
+        CStrWithLength& operator=(const CStrWithLength& other)
+        {
+            CStrWithLength* self = this;
+            if (self == &other) return *this;
+            if (getAutoRelease()) release();
+            memcpy(self, &other, sizeof(CStrWithLength));
+            return *this;
+        }
+
 
     private:
         union
@@ -91,7 +115,7 @@ namespace Uranium
             };
             struct
             {
-                char SSOSizeAndAutoRelease;
+                unsigned char SSOSizeAndAutoRelease;
                 char SSO[15];
             };
         };
@@ -104,7 +128,7 @@ namespace Uranium
         constexpr static uint8_t SSOSize = 0xF;
     protected:
 
-        __forceinline bool isSSO() const { return (SSOSizeAndAutoRelease & pSSOFlag) == pSSOFlag; }
+        __forceinline bool isSSO() const { return (SSOSizeAndAutoRelease & pSSOFlag) != 0; }
         __forceinline size_t getLength() const
         {
             if (isSSO())
@@ -160,8 +184,10 @@ namespace Uranium
 
         __forceinline void setAutoRelease(bool autoRelease)
         {
+            char autoReleaseBit = autoRelease ? pLastBitMask : 0;
+
             if (isSSO())
-                SSOSizeAndAutoRelease = (SSOSizeAndAutoRelease & pSSOSizeMask) | (autoRelease ? pLastBitMask : 0);
+                SSOSizeAndAutoRelease |= autoReleaseBit;
             else
                 lengthAndAutoRelease.setBool(autoRelease);
         }

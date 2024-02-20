@@ -10,7 +10,7 @@ namespace Uranium
 
 	CStrWithLength Version::ToString() const
 	{
-		return CStrWithLength(std::format("{}.{}.{}", major, minor, patch));
+		return CStrWithLength(std::format("{}.{}.{}", major, minor, patch), false);
 	}
 
 	bool Version::operator==(const Version& other) const

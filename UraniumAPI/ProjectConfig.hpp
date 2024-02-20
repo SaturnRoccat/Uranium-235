@@ -63,7 +63,7 @@ namespace Uranium
 
 		const CStrWithLength getNameWithNamespace(CStrWithLength Name) const
 		{
-			return CStrWithLength(namespace_ + ":" + Name.toString());
+			return CStrWithLength(namespace_ + ":" + Name.toString(), false);
 		}
 
 		UUIDv4::UUIDGenerator<std::mt19937_64>* getUUID() 

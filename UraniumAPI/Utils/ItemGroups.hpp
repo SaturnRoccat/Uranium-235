@@ -250,7 +250,7 @@ namespace Uranium::ItemGroups
 	};
 	static CStrWithLength itemGroupToString(ItemGroup itemGroup)
 	{
-		return { ItemGroupNames[static_cast<int>(itemGroup)].c_str(), ItemGroupNames[static_cast<int>(itemGroup)].size() };
+		return { ItemGroupNames[static_cast<int>(itemGroup)].c_str(), ItemGroupNames[static_cast<int>(itemGroup)].size(), false };
 	}
 }
         

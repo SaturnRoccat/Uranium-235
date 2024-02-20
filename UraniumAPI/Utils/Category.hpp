@@ -18,7 +18,7 @@ namespace Uranium::Catagories
     // O(1) time complexity
     static CStrWithLength catagoryToString(Catagory catagory)
     {
-        return { catagories[static_cast<int>(catagory)].c_str(), catagories[static_cast<int>(catagory)].size() };
+        return { catagories[static_cast<int>(catagory)].c_str(), catagories[static_cast<int>(catagory)].size(), false };
     }
 
     // O(n) time complexity (n = number of catagories)
