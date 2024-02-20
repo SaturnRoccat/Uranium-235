@@ -42,19 +42,21 @@ namespace Uranium::Blocks
             }
             m_displayName = displayName;
 			m_name = identifierIn;
-            m_formatVersion = formatVersion;
+            setFormatVersion(formatVersion);
+            m_name.setAutoDelete(true);
+            m_displayName.setAutoDelete(true);
 
         };
 
         CStrWithLength GetDisplayName() { return m_displayName; }
         CStrWithLength GetName() { return m_name; }
 
-        void setCategoryData(const BlockMenuCategory& categoryData) { m_categoryData = categoryData; }
-        BlockMenuCategory getCategoryData() const { return m_categoryData; }
+        void setCategoryData(const BlockMenuCategory& categoryData) { setCategoryDataInternal(categoryData); }
+        BlockMenuCategory getCategoryData() const { return getCategoryData(); }
         void addComponent(Components::Blocks::BlockComponent* component) { m_components.push_back(component); }
         void addBlockState(States::BlockState* blockState);
         void addPermutation(const Permutation& permutation) { m_permutations.push_back(permutation); }
-        void addEvent(Events::Event* event) { m_events.push_back(event); }
+        //void addEvent(Events::Event* event) { m_events.push_back(event); }
 
         void compileBlock(
             ProjectSettings* projectSettings,
@@ -80,10 +82,10 @@ namespace Uranium::Blocks
             RapidProxy::DefaultValueWriter writer
         );
 
-        void recursiveCompileEvents(
+        /*void recursiveCompileEvents(
 			NonOwningPointer<ProjectSettings> projectSettings,
 			RapidProxy::DefaultValueWriter writer
-		);
+		);*/
     private:
         CStrWithLength m_displayName;
         CStrWithLength m_name;
@@ -93,9 +95,33 @@ namespace Uranium::Blocks
         std::vector<Components::Blocks::BlockComponent*> m_components;
         std::vector<States::BlockState*> m_blockStates;
         std::vector<Permutation> m_permutations;
-        std::vector<Events::Event*> m_events;
-        Version m_formatVersion;
-        BlockMenuCategory m_categoryData;
+        //std::vector<Events::Event*> m_events;
+       /* Version m_formatVersion;
+        BlockMenuCategory m_categoryData;*/
+    private:
+        constexpr static size_t formatVersionOffset = 0x19;
+        constexpr static size_t categoryDataOffset = formatVersionOffset + sizeof(Version);
+        void inline setFormatVersion(Version version) 
+        {
+            BlockTextureMetadata* metaData = &m_textureMetadata;
+            memcpy((void*)((uint64_t)metaData + formatVersionOffset), &version, sizeof(Version));
+        }
+        Version& getFormatVersion() 
+		{
+			BlockTextureMetadata* metaData = &m_textureMetadata;
+			return *(Version*)((uint64_t)metaData + formatVersionOffset);
+		}
+		void inline setCategoryDataInternal(const BlockMenuCategory& categoryData) 
+		{
+			BlockTextureMetadata* metaData = &m_textureMetadata;
+			memcpy((void*)((uint64_t)metaData + categoryDataOffset), &categoryData, sizeof(BlockMenuCategory));
+		}
+        BlockMenuCategory& getCategoryData()
+        {
+            BlockTextureMetadata* metaData = &m_textureMetadata;
+			return *(BlockMenuCategory*)((uint64_t)metaData + categoryDataOffset);
+        }
+
 
     };
 }

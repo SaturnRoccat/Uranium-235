@@ -21,7 +21,7 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	// Sets up the json
 	endJson->SetObject();
 	rapidjson::Document::AllocatorType& allocator = endJson->GetAllocator();
-	CStrWithLength str = m_formatVersion.ToString();
+	CStrWithLength str = getFormatVersion().ToString();
 	endJson->AddMember("format_version", str.toValue(), allocator);
 
 	rapidjson::Value blockObj(rapidjson::kObjectType);
@@ -29,20 +29,21 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	rapidjson::Value& description = blockObj["description"];
 
 	CStrWithLength NameWithNamespace = projectSettings->getNameWithNamespace(this->m_name);
+	NameWithNamespace.setAutoDelete(true);
 	description.AddMember("identifier", NameWithNamespace.toValue(), allocator);
 	description.AddMember("menu_catagory", rapidjson::Value(rapidjson::kObjectType), allocator);
 
-	if (this->m_categoryData.category != Catagories::Catagory::none)
+	if (getCategoryData().category != Catagories::Catagory::none)
 	{
 		rapidjson::Value& menuCategory = description["menu_catagory"];
-		auto catData = Catagories::catagoryToString(this->m_categoryData.category);
+		auto catData = Catagories::catagoryToString(getCategoryData().category);
 		menuCategory.AddMember("category", catData.toValue(), allocator);
-		if (this->m_categoryData.itemGroup != ItemGroups::ItemGroup::NUL)
+		if (getCategoryData().itemGroup != ItemGroups::ItemGroup::NUL)
 		{
-			auto itemGroup = ItemGroups::itemGroupToString(this->m_categoryData.itemGroup);
+			auto itemGroup = ItemGroups::itemGroupToString(getCategoryData().itemGroup);
 			menuCategory.AddMember("group", itemGroup.toValue(), allocator);
 		}
-		if (this->m_categoryData.isHiddenInCommands)
+		if (getCategoryData().isHiddenInCommands)
 			menuCategory.AddMember("is_hidden_in_commands", true, allocator);
 
 	}
