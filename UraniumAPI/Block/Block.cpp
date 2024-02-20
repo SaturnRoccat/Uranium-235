@@ -66,10 +66,10 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 		this->recursiveCompilePermutations(projectSettings, RapidProxy::DefaultValueWriter(&permutations, allocator));
 	}
 
-	if (this->m_events.size() > 0)
+	/*if (this->m_events.size() > 0)
 	{
 		this->recursiveCompileEvents(projectSettings, {&blockObj, allocator});
-	}
+	}*/
 
 	this->recursiveCompile(projectSettings, RapidProxy::DefaultValueWriter(&components, allocator));
 
@@ -122,14 +122,14 @@ void Uranium::Blocks::Block::recursiveCompilePermutations(NonOwningPointer<Proje
 		data->PushBack(permutationData, allocator);
 	}
 }
-
-void Uranium::Blocks::Block::recursiveCompileEvents(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
-{
-	DVAP()
-	rapidjson::Value events(rapidjson::kObjectType);
-	for (auto e : this->m_events)
-	{
-		e->CompileEvent({ &events, allocator });
-	}
-	data->AddMember("events", events, allocator);
-}
+//
+//void Uranium::Blocks::Block::recursiveCompileEvents(NonOwningPointer<ProjectSettings> projectSettings, RapidProxy::DefaultValueWriter writer)
+//{
+//	DVAP()
+//	rapidjson::Value events(rapidjson::kObjectType);
+//	for (auto e : this->m_events)
+//	{
+//		e->CompileEvent({ &events, allocator });
+//	}
+//	data->AddMember("events", events, allocator);
+//}
