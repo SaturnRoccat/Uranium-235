@@ -134,7 +134,7 @@ namespace Uranium
 		{
 			data = (data & boolMask) | (length & lengthMask);
 		}
-		__forceinline uint64_t getLength()
+		__forceinline uint64_t getLength() const 
 		{
 			return data & lengthMask;
 		}
@@ -142,7 +142,7 @@ namespace Uranium
 		{
 			data = (data & lengthMask) | (value ? boolMask : 0);
 		}
-		__forceinline bool getBool()
+		__forceinline bool getBool() const
 		{
 			return data & boolMask;
 		}
