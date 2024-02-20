@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "../Utils/Logger/Logger.hpp"
+#include "../Utils/strUtil.hpp"
 #include <string>
 
 namespace Uranium
@@ -26,7 +27,7 @@ namespace Uranium
     class Texture
     {
     public:
-        Texture(const std::string& path) : m_path(path) {}
+        Texture(CStrWithLength path) : m_path(path) {}
         Texture(bool) : m_isPath(false) {} // Unused param just for the constructor to be different
         Texture() = default;
         ~Texture()
@@ -39,7 +40,7 @@ namespace Uranium
 
         void LoadToMemory();
 
-        void WriteToLocation(const std::string& path);
+        void WriteToLocation(CStrWithLength path);
 
         void inline SetPixel(size_t x, size_t y, Color color)
         {
@@ -84,7 +85,7 @@ namespace Uranium
         inline int GetHeight() const { return m_height; }
         inline int GetChannels() const { return m_channels; }
 
-        std::string GetOutputLocation() const { return ""; }
+        CStrWithLength GetOutputLocation() const { return ""; }
 
         // More compilex writters
         void DrawLine(int x1, int y1, int x2, int y2, Color color);
@@ -95,13 +96,13 @@ namespace Uranium
 
 
 
-        std::string GetPath() const { return m_path; }
+        CStrWithLength GetPath() { return m_path; }
     private:
-        std::string m_path;
+        CStrWithLength m_path;
 
-        int m_width = 0;
-        int m_height = 0;
-        int m_channels = 0;
+        uint16_t m_width = 0;
+        uint16_t m_height = 0;
+        uint16_t m_channels = 0;
 
         bool m_isPath = true;
 
@@ -111,12 +112,12 @@ namespace Uranium
     class BlockTexture : public Texture
     {
     public:
-        BlockTexture(const std::string& path) : Texture(path) {}
+        BlockTexture(CStrWithLength path) : Texture(path) {}
         BlockTexture(bool) : Texture(false) {} // Unused param just for the constructor to be different
         BlockTexture() = default;
 
     private:
     };
 
-
+    
 }

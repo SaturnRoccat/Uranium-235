@@ -8,7 +8,7 @@ namespace Uranium
 	{
 		for (auto& [name, Texture] : m_BlockMap)
 		{
-			Texture.WriteToLocation(m_RPPath + "textures/blocks/" + name + ".png");
+			//Texture.WriteToLocation(CStrWithLength(std::string(m_RPPath + "textures/blocks/" + name + ".png")));
 		}
 	}
 }

@@ -21,8 +21,8 @@ namespace Uranium::Blocks
 		rapidjson::Value compilePermutation(rapidjson::Document::AllocatorType& allocator, NonOwningPointer<ProjectSettings> pjs) const;
 
 	private:
-		const char* condition;
-		std::vector<Components::Blocks::BlockComponent*> components;
+		const char* condition = "";
+		std::vector<Components::Blocks::BlockComponent*> components = {};
 	};
 
 }

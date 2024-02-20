@@ -10,9 +10,9 @@
 namespace Uranium
 {
 
-    std::string pathToDir(const std::string& path)
+    CStrWithLength pathToDir(CStrWithLength path)
     {
-		std::string dir = "";
+        CStrWithLength dir = "";
         // Walk backwards until you find a / or a \ or you reach the start of the string
         for (size_t i = path.size() - 1; i > 0; i--)
         {
@@ -25,13 +25,13 @@ namespace Uranium
 		return dir;
 	}
 
-    void Texture::WriteToLocation(const std::string& path)
+    void Texture::WriteToLocation(CStrWithLength path)
     {
         // If path doesnt exist create it
-        std::string dir = pathToDir(path);
-        if (!std::filesystem::exists(dir))
+        CStrWithLength dir = pathToDir(path);
+        if (!std::filesystem::exists(dir.c_str()))
         {
-			std::filesystem::create_directories(dir);
+			std::filesystem::create_directories(dir.c_str());
 		}
 
         if (m_isPath)
@@ -53,7 +53,11 @@ namespace Uranium
     void Texture::LoadToMemory()
     {
         m_isPath = false;
-        data = stbi_load(m_path.c_str(), &m_width, &m_height, &m_channels, 0);
+        int width, height, channels;
+        data = stbi_load(m_path.c_str(), &width, &height, &channels, 0);
+        m_width = (uint16_t)width;
+        m_height = (uint16_t)height;
+        m_channels = (uint16_t)channels;
         if (!data)
         {
 			Logs::Logger::Error("Failed to load texture: {}", m_path);

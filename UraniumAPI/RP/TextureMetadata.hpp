@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../Utils/strUtil.hpp"
 #include <string>
 
 namespace Uranium
@@ -7,17 +7,17 @@ namespace Uranium
 	class TextureMetadata
 	{
 	public:
-		TextureMetadata(const std::string& path = "NULL") : m_path(path) {}
+		TextureMetadata(CStrWithLength path = "NULL") : m_path(path) {}
 		inline bool isNull() const { return m_path == "NULL"; }
 	private:
-		std::string m_path;
+		CStrWithLength m_path;
 	};
 
 
 	class BlockTextureMetadata : public TextureMetadata
 	{
 	public:
-		BlockTextureMetadata(const std::string& path = "NULL", bool usesCustomModel = false) : m_usesCustomModel(usesCustomModel), TextureMetadata(path) {}
+		BlockTextureMetadata(CStrWithLength path = "NULL", bool usesCustomModel = false) : m_usesCustomModel(usesCustomModel), TextureMetadata(path) {}
 		bool UsesCustomModel() const { return m_usesCustomModel; }
 		void SetCustomModel(class Geometry* geometry) { m_geometry = geometry; m_usesCustomModel = true; }
 		class Geometry* GetCustomModel() const { return m_geometry; }

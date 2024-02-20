@@ -17,9 +17,9 @@ namespace Uranium
     public:
         TextureRegistery(const std::string& RP) : m_RPPath(RP) {}
 
-        void inline RegisterTexture(const std::string& name, const std::string& path, TextureType type)
+        void inline RegisterTexture(const std::string& name, CStrWithLength path, TextureType type)
         {
-            if (!StrUtils::isPath(path))
+            if (!StrUtils::isPath(path.c_str()))
             {
                 Logs::Logger::Error("If you are trying to register a texture from a string that isnt a path, Use a Texture object instead!");
                 return;

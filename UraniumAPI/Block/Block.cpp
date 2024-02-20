@@ -21,7 +21,7 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	// Sets up the json
 	endJson->SetObject();
 	rapidjson::Document::AllocatorType& allocator = endJson->GetAllocator();
-	CStrWithLength str = CStrWithLength(m_formatVersion.ToString());
+	CStrWithLength str = m_formatVersion.ToString();
 	endJson->AddMember("format_version", str.toValue(), allocator);
 
 	rapidjson::Value blockObj(rapidjson::kObjectType);

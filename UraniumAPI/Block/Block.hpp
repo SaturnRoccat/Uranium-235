@@ -46,8 +46,8 @@ namespace Uranium::Blocks
 
         };
 
-        CStrWithLength GetDisplayName() const { return m_displayName; }
-        CStrWithLength GetName() const { return m_name; }
+        CStrWithLength GetDisplayName() { return m_displayName; }
+        CStrWithLength GetName() { return m_name; }
 
         void setCategoryData(const BlockMenuCategory& categoryData) { m_categoryData = categoryData; }
         BlockMenuCategory getCategoryData() const { return m_categoryData; }
@@ -63,7 +63,7 @@ namespace Uranium::Blocks
         );
         void SetTexture(const BlockTexture& texture) { m_texture = texture; };
         //void SetGeometry(class Geometry* geometry) { m_textureMetadata.SetCustomModel(geometry); };
-        BlockTextureMetadata GetTextureMetadata() const { return m_textureMetadata; }
+        BlockTextureMetadata GetTextureMetadata() { return m_textureMetadata; }
     private:
         void recursiveCompile(
             NonOwningPointer<ProjectSettings> projectSettings,
