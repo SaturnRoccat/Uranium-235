@@ -15,8 +15,8 @@ namespace Uranium
 		{
 		public:
 			Header(
-				const char* name,
-				const char* description,
+				CStrWithLength name,
+				CStrWithLength description,
 				NonOwningPointer<ProjectSettings> projectSettings,
 				Version minEngineVersion = LATEST_FORMAT_VERSION,
 				Version baseGameVersion = LATEST_FORMAT_VERSION
@@ -33,8 +33,8 @@ namespace Uranium
 			void WriteHeader(RapidProxy::DefaultValueWriter dvw);
 
 			// Getters
-			const std::string& getName() const { return m_name; }
-			const std::string& getDescription() const { return m_description; }
+			CStrWithLength getName() const { return m_name; }
+			CStrWithLength getDescription() const { return m_description; }
 			const Version& getMinEngineVersion() const { return m_minEngineVersion; }
 			const Version& getBaseGameVersion() const { return m_baseGameVersion; }
 			const Version& getVersion() const { return m_version; }
@@ -44,8 +44,8 @@ namespace Uranium
 			Version m_baseGameVersion;
 			Version m_version;
 			Version m_minEngineVersion;
-			std::string m_description;
-			std::string m_name;
+			CStrWithLength m_description;
+			CStrWithLength m_name;
 			UUIDv4::UUID uuid;
 		};
 
@@ -53,10 +53,10 @@ namespace Uranium
 		{
 		public:
 			Module(
-				const char* type,
+				CStrWithLength type,
 				Version version,
 				NonOwningPointer<ProjectSettings> projectSettings,
-				const char* language
+				CStrWithLength language
 				)
 			{
 				this->m_type = type;
@@ -70,17 +70,17 @@ namespace Uranium
 			void WriteModule(RapidProxy::DefaultValueWriter dvw);
 
 			// Getters
-			const std::string& getDescription() const { return m_description; }
-			const std::string& getType() const { return m_type; }
+			CStrWithLength getDescription() const { return m_description; }
+			CStrWithLength getType() const { return m_type; }
 			const Version& getVersion() const { return m_version; }
-			const std::string& getLanguage() const { return language; }
+			CStrWithLength getLanguage() const { return language; }
 			const UUIDv4::UUID& getUUID() const { return uuid; }
 		private:
-			std::string m_description;
-			std::string m_type;
+			CStrWithLength m_description;
+			CStrWithLength m_type;
 			UUIDv4::UUID uuid;
 			Version m_version;
-			std::string language;
+			CStrWithLength language;
 		};
 
 		class Dependencies
@@ -114,7 +114,7 @@ namespace Uranium
 			RAYTRACED
 		};
 
-		constexpr static const std::string& capabilitiesToString(Capabilities cap)
+		constexpr static const char* capabilitiesToString(Capabilities cap)
 		{
 			switch (cap)
 			{
@@ -136,8 +136,8 @@ namespace Uranium
 		public:
 			Metadata(
 				NonOwningPointer<ProjectSettings> projectSettings,
-				const char* license = "",
-				const char* url = ""
+				CStrWithLength license = "",
+				CStrWithLength url = ""
 			)
 			{
 				this->m_license = license;
@@ -147,22 +147,22 @@ namespace Uranium
 
 			void WriteMetadata(RapidProxy::DefaultValueWriter dvw);
 
-			void inline addGeneratedWith(const char* name, Version version)
+			void inline addGeneratedWith(CStrWithLength name, Version version)
 			{
 				m_generatedWith.push_back(std::make_pair(name, version));
 			}
 
 			// Getters
-			const std::string& getLicense() const { return m_license; }
-			const std::string& getURL() const { return m_url; }
-			const std::string& getAuthor() const { return m_author; }
-			const std::vector<std::pair<std::string, Version>>& getGeneratedWith() const { return m_generatedWith; }
+			CStrWithLength getLicense() const { return m_license; }
+			CStrWithLength getURL() const { return m_url; }
+			CStrWithLength getAuthor() const { return m_author; }
+			const std::vector<std::pair<CStrWithLength, Version>>& getGeneratedWith() const { return m_generatedWith; }
 
 		private:
-			std::string m_license;
-			std::string m_url;
-			std::string m_author;
-			std::vector<std::pair<std::string, Version>> m_generatedWith = {
+			CStrWithLength m_license;
+			CStrWithLength m_url;
+			CStrWithLength m_author;
+			std::vector<std::pair<CStrWithLength, Version>> m_generatedWith = {
 				{ "Uranium", CURRENT_URANIUM_VERSION}
 			};
 		};

@@ -51,7 +51,7 @@ int main()
             {Uranium::Experimentals::BetaAPIs, true}
         }
     ));
-    const int blockCount = 1600000;
+    const int blockCount = 2000000;
     std::vector<Uranium::Blocks::Block*> block;
     block.reserve(blockCount);
     double genTime = 0;

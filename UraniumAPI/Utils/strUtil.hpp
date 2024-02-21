@@ -61,6 +61,7 @@ namespace Uranium
     public:
         inline rapidjson::Value toValue() { return rapidjson::Value(getRawData(), rapidjson::SizeType(getLength())); }
         inline char* c_str() { return getRawData(); }
+        inline const char* c_str() const { return getRawData(); }
         inline size_t size() const { return getLength(); }
         inline void setAutoDelete(bool autoDelete) { setAutoRelease(autoDelete); }
         inline std::string toString() { return std::string(getRawData(), getLength()); }
@@ -200,7 +201,7 @@ namespace Uranium
 
     struct CStrWithLengthHasher
     {
-        std::size_t operator()(CStrWithLength& k) const
+        std::size_t operator()(const CStrWithLength& k) const
         {
 			std::hash<std::string_view> hasher;
 			return hasher(std::string_view(k.c_str(), k.size()));
