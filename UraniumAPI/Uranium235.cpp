@@ -6,5 +6,6 @@ namespace Uranium
 		settings->outputLocation + settings->name + "_RP/"
 	)
 	{
+		Logs::Logger::Info("Starting Uranium 235");
 	}
 }

@@ -7,12 +7,9 @@
 Uranium::Blocks::Block* generateBlock(int index)
 {
     // "testidentifier_to_try_andbreak_mycode"
-    Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "sso_test", Uranium::Version(1, 20, 30));
+    Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "block", Uranium::Version(1, 20, 30));
     //Uranium::Blocks::Block* block = new Uranium::Blocks::Block("Test Block!", "testIdentifier_to_Try_andBreak_myCode" + index, Uranium::Version(1, 20, 30));
 
-   /* block->addBlockState(
-        new Uranium::Blocks::States::BlockStateInteger("local:testInt", 0, 1)
-    );*/
     block->addBlockState(
         new Uranium::Blocks::States::BlockStateInteger("local:testInt2", 0, 5)
     );
@@ -54,13 +51,14 @@ int main()
             {Uranium::Experimentals::BetaAPIs, true}
         }
     ));
-
-    const int blockCount = 1;
+    const int blockCount = 1600000;
     std::vector<Uranium::Blocks::Block*> block;
     block.reserve(blockCount);
+    double genTime = 0;
     //Uranium::Blocks::Block* block;
     {
-        //Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
+        Uranium::ScopedTimer timerScoped("Block Generation. In worst case");
+        Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
         for (int i = 0; i < blockCount; i++)
         {
             block.push_back( generateBlock(i));
@@ -69,7 +67,7 @@ int main()
 
     rapidjson::Document json;
     {
-		Uranium::AverageTimer timer("Block Compilation. In worst case", blockCount);
+        Uranium::AverageTimer timer("Block Compilation and writing. In worst case", blockCount);
         for (int i = 0; i < blockCount; i++)
         {
             block[i]->compileBlock(uranium->getProjectSettings(), &json);

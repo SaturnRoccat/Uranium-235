@@ -6,3 +6,10 @@ obj/
 .vscode/
 include/rapidjson/
 include/uuidv4/
+# ignore the docs folder
+Meltdown/MCPEDocs/
+Meltdown/packages/ 
+Meltdown/packages.zip 
+Meltdown/node_modules/
+Meltdown/__pycache__/
+Meltdown/schemas.json

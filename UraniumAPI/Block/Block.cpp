@@ -29,7 +29,6 @@ void Uranium::Blocks::Block::compileBlock(ProjectSettings* projectSettings, rapi
 	rapidjson::Value& description = blockObj["description"];
 
 	CStrWithLength NameWithNamespace = projectSettings->getNameWithNamespace(this->m_name);
-	NameWithNamespace.setAutoDelete(true);
 	description.AddMember("identifier", NameWithNamespace.toValue(), allocator);
 	description.AddMember("menu_catagory", rapidjson::Value(rapidjson::kObjectType), allocator);
 
