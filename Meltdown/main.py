@@ -11,7 +11,7 @@ searchTypes: list[str] = [
     "block/"
 ]
 
-stringsManIDontWantToType: list[str] = [
+stringsManIDontWantToType: list[list[str]] = [
     [
         "file:///data/packages/minecraftBedrock/schema/item/v1.20.50/components/",
         "file:///data/packages/minecraftBedrock/schema/item/"

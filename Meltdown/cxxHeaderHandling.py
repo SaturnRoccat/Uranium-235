@@ -50,6 +50,9 @@ class CxxType:
     def setType(self, type: str):
         self.type = type
 
+    def setName(self, name: str):
+        self.name = name
+
     def getName(self) -> str:
         return self.name
     
@@ -76,6 +79,10 @@ class CxxEnum():
 
     def setConversionArray(self, conversionArray: list[str]):
         self.conversionArray = conversionArray
+        if conversionArray != []:
+            self.hasTranslation = True
+        else:
+            self.hasTranslation = False
 
     def dumpValues(self) -> str:
         returnData: str = f"values of {self.name}:\n"
@@ -92,7 +99,7 @@ class CxxEnum():
             returnData += f"    {value}\n"
         return returnData
     
-    def generateEnumCxxDef(self, namespace: str) -> str:
+    def generateEnumCxxDef(self, namespace: str = "") -> str:
         returnData: str = ""
         if namespace != "":
             returnData += f"namespace {namespace} {'{'}\n"
