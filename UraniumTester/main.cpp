@@ -61,7 +61,7 @@ int main()
         Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
         for (int i = 0; i < blockCount; i++)
         {
-            block.push_back( generateBlock(i));
+            block.push_back(generateBlock(i));
 		}
     }
 
