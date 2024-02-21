@@ -12,7 +12,7 @@ project "Uranium_235"
     targetdir "out/bin/Uranium_235/%{cfg.buildcfg}"
 
     -- include the include directory
-    includedirs { "include/" }
+    includedirs { "include/", "glaze/include/glaze" }
 
     -- Use C++ 20
     cppdialect "C++20"
