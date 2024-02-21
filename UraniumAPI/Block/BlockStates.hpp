@@ -41,6 +41,7 @@ namespace Uranium::Blocks::States
 	public:
 		BlockStateInteger(CStrWithLength state_ID, int min, int max) : BlockState(state_ID)
 		{
+			values.reserve(max - min + 1); // Reserve the space so we don't have to reallocate
 			for (int i = min; i <= max; i++) { values.push_back(i); } 
 		}
 

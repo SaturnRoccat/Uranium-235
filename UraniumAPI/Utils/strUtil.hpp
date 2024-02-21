@@ -61,6 +61,7 @@ namespace Uranium
     public:
         inline rapidjson::Value toValue() { return rapidjson::Value(getRawData(), rapidjson::SizeType(getLength())); }
         inline char* c_str() { return getRawData(); }
+        inline const char* c_str() const { return getRawData(); }
         inline size_t size() const { return getLength(); }
         inline void setAutoDelete(bool autoDelete) { setAutoRelease(autoDelete); }
         inline std::string toString() { return std::string(getRawData(), getLength()); }
@@ -85,10 +86,10 @@ namespace Uranium
         bool operator!=(const std::string_view& other) { return strncmp(getRawData(), other.data(), other.size()) != 0; }
         bool operator!=(CStrWithLength& other) const { return strncmp(getRawData(), other.getRawData(), other.size()) != 0; }
 
-        CStrWithLength operator+(const char* other) { return CStrWithLength(getRawData(), getLength() + strlen(other)); }
-        CStrWithLength operator+(const std::string& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
-        CStrWithLength operator+(const std::string_view& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
-		CStrWithLength operator+(CStrWithLength& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
+        CStrWithLength operator+(const char* other) const { return CStrWithLength(getRawData(), getLength() + strlen(other)); }
+        CStrWithLength operator+(const std::string& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
+        CStrWithLength operator+(const std::string_view& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
+		CStrWithLength operator+(CStrWithLength& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
 
         CStrWithLength& operator+=(const char* other) { return *this = *this + other; }
 		CStrWithLength& operator+=(const std::string& other) { return *this = *this + other; }
@@ -194,11 +195,13 @@ namespace Uranium
 
         
         friend struct CStrWithLengthHasher; // for hashing
-    };
+    public:
+
+};
 
     struct CStrWithLengthHasher
     {
-        std::size_t operator()(CStrWithLength& k) const
+        std::size_t operator()(const CStrWithLength& k) const
         {
 			std::hash<std::string_view> hasher;
 			return hasher(std::string_view(k.c_str(), k.size()));

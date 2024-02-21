@@ -51,7 +51,7 @@ int main()
             {Uranium::Experimentals::BetaAPIs, true}
         }
     ));
-    const int blockCount = 1600000;
+    const int blockCount = 2000000;
     std::vector<Uranium::Blocks::Block*> block;
     block.reserve(blockCount);
     double genTime = 0;
@@ -61,7 +61,7 @@ int main()
         Uranium::AverageTimer timer("Block Creation. In worst case", blockCount);
         for (int i = 0; i < blockCount; i++)
         {
-            block.push_back( generateBlock(i));
+            block.push_back(generateBlock(i));
 		}
     }
 

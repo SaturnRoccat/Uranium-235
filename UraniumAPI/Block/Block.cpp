@@ -9,8 +9,10 @@ void Uranium::Blocks::Block::addBlockState(States::BlockState* blockState)
 			permutationCount *= state->GetPermutationSize();
 	}
 
+#ifndef BYPASSCHECKS
 	if (permutationCount > 65536)
 		Logs::Logger::Error("Too many states for block {}!", this->m_name);
+#endif //BYPASSCHECKS
 
 	this->m_blockStates.push_back(blockState);
 

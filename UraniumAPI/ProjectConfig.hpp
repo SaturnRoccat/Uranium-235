@@ -49,11 +49,11 @@ namespace Uranium
 	public:
 		ProjectSettings(
 			const Version& version = Version(),
-			const std::string& name = "Uranium Project",
-			const std::string& description = "A Uranium Project",
-			const std::string& author = "Uranium",
-			const std::string& outputLocation = "UraniumOut/",
-			const std::string& namespace_ = "uranium",
+			CStrWithLength name = "Uranium Project",
+			CStrWithLength description = "A Uranium Project",
+			CStrWithLength author = "Uranium",
+			CStrWithLength outputLocation = "UraniumOut/",
+			CStrWithLength namespace_ = "uranium",
 			const std::vector<std::pair<Experimentals, bool>>& experimentals = {}
 		)
 			: version(version), name(name), description(description), author(author), experimentals(experimentals), namespace_(namespace_)
@@ -63,7 +63,7 @@ namespace Uranium
 
 		const CStrWithLength getNameWithNamespace(CStrWithLength Name) const
 		{
-			return CStrWithLength(namespace_ + ":" + Name.toString(), false);
+			return CStrWithLength(namespace_ + ":" + Name, false);
 		}
 
 		UUIDv4::UUIDGenerator<std::mt19937_64>* getUUID() 
@@ -72,13 +72,13 @@ namespace Uranium
 		}
 
 	public:
-		std::string namespace_;
+		CStrWithLength namespace_;
 		Version version;
-		std::string name;
-		std::string description;
-		std::string author;
+		CStrWithLength name;
+		CStrWithLength description;
+		CStrWithLength author;
 		std::vector<std::pair<Experimentals, bool>> experimentals;
-		std::string outputLocation;
+		CStrWithLength outputLocation;
 		UUIDv4::UUIDGenerator<std::mt19937_64> gen;
 	};
 }

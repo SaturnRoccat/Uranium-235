@@ -15,7 +15,7 @@ namespace Uranium
 	private:
 		UUIDv4::UUIDGenerator<std::mt19937_64> m_UUIDGenerator;
 		ProjectSettings* m_ProjectSettings;
-		TextureRegistery m_TextureRegistery;
+		//TextureRegistery m_TextureRegistery;
 	private:
 		std::unordered_map<CStrWithLength, Blocks::Block*, CStrWithLengthHasher> m_BlockRegistery;
 		std::unordered_map<CStrWithLength, Entities::Entity*, CStrWithLengthHasher> m_EntityRegistery;
