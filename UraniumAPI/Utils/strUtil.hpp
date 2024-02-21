@@ -85,10 +85,10 @@ namespace Uranium
         bool operator!=(const std::string_view& other) { return strncmp(getRawData(), other.data(), other.size()) != 0; }
         bool operator!=(CStrWithLength& other) const { return strncmp(getRawData(), other.getRawData(), other.size()) != 0; }
 
-        CStrWithLength operator+(const char* other) { return CStrWithLength(getRawData(), getLength() + strlen(other)); }
-        CStrWithLength operator+(const std::string& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
-        CStrWithLength operator+(const std::string_view& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
-		CStrWithLength operator+(CStrWithLength& other) { return CStrWithLength(getRawData(), getLength() + other.size()); }
+        CStrWithLength operator+(const char* other) const { return CStrWithLength(getRawData(), getLength() + strlen(other)); }
+        CStrWithLength operator+(const std::string& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
+        CStrWithLength operator+(const std::string_view& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
+		CStrWithLength operator+(CStrWithLength& other) const { return CStrWithLength(getRawData(), getLength() + other.size()); }
 
         CStrWithLength& operator+=(const char* other) { return *this = *this + other; }
 		CStrWithLength& operator+=(const std::string& other) { return *this = *this + other; }
@@ -194,7 +194,9 @@ namespace Uranium
 
         
         friend struct CStrWithLengthHasher; // for hashing
-    };
+    public:
+
+};
 
     struct CStrWithLengthHasher
     {
