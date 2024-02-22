@@ -1,22 +1,28 @@
 #include "memberComponentParser.hpp"
-
+#include "../Utils/Logger/Logger.hpp"
 
 std::vector<Uranium::MemberComponentData> Uranium::MemberComponentParser::Parse(const rapidjson::Value& parserTarget, const KeyInformation& keyInfo)
 {
 	std::vector<MemberComponentData> out;
-	if (!parserTarget.HasMember("anyOf"))
+	if (!parserTarget.HasMember("allOf"))
 	{
 		internalParse(parserTarget, keyInfo, out, Experimentals::None);
 		return out;
 	}
-	auto anyOf = parserTarget["anyOf"].GetArray();
-	for (auto& obj : anyOf)
+	auto allOf = parserTarget["allOf"].GetArray();
+	for (auto& obj : allOf)
 	{
 		Experimentals flags = Experimentals::None;
 		if (obj.HasMember("$ref"))
+		{
 			flags = KeyGenerator::resolveExperimentalData(std::string_view(obj["$ref"].GetString(), (size_t)obj["$ref"].GetStringLength()));
-		internalParse(obj, keyInfo, out, flags);
+			auto& parseData = obj["then"];
+			internalParse(parseData, keyInfo, out, flags);
+		}
+		else
+			internalParse(obj, keyInfo, out, flags);
 	}
+	return out;
 }
 
 void Uranium::MemberComponentParser::internalParse(const rapidjson::Value& parserTarget, const KeyInformation& keyInfo, std::vector<MemberComponentData>& out, Experimentals experimentalFlags)
@@ -42,7 +48,7 @@ void Uranium::MemberComponentParser::internalParse(const rapidjson::Value& parse
 			data.Key = Uranium::KeyGenerator::resolveRefCallPath(std::string_view(ref.GetString(), (size_t)ref.GetStringLength()), keyInfo.longPrefix, keyInfo.shortPrefix);
 		}
 		else
-			data.Key = Uranium::KeyGenerator::resolveRefCallPath(std::string_view(itr->value.GetString(), (size_t)itr->value.GetStringLength()), keyInfo.longPrefix, keyInfo.shortPrefix);
+			data.Key = Uranium::KeyGenerator::resolveRefCallPath(std::string_view(itr->value["$ref"].GetString(), (size_t)itr->value["$ref"].GetStringLength()), keyInfo.longPrefix, keyInfo.shortPrefix);
 		out.push_back(data);
 	}
 }
