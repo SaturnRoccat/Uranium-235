@@ -79,7 +79,7 @@ namespace Uranium
 			return highestVersionKeys;
 		}
 
-		inline std::string resolveRefCallPath(std::string_view refCallPath,const std::string& longPath, const std::string& shortPath)
+		static std::string resolveRefCallPath(std::string_view refCallPath,const std::string& longPath, const std::string& shortPath)
 		{
 			std::string returnData;
 			if (!refCallPath.ends_with(".json"))
