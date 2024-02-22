@@ -5,6 +5,7 @@
 #include <array>
 #include <xstring>
 #include "../Utils/predecs.hpp"
+#include "../Utils/experimentals.hpp"
 #include <iostream>
 
 namespace Uranium
@@ -97,14 +98,14 @@ namespace Uranium
 			return returnData;
 		}
 
-		static std::string resolveExperimentalData(std::string_view expString)
+		static Experimentals resolveExperimentalData(std::string_view expString)
 		{
 			size_t lastSlash = expString.find_last_of('/');
 			size_t lastDot = expString.find_last_of('.');
 			if (lastSlash == std::string_view::npos || lastDot == std::string_view::npos)
 				throw std::runtime_error("Invalid experimental data string");
 			std::string_view expData = expString.substr(lastSlash + 1, lastDot - lastSlash - 1);
-			return std::string(expData);
+			return getExperimentalFromName(expData);
 		}
 	private:
 	};
