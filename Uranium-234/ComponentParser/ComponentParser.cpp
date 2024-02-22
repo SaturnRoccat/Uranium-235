@@ -2,11 +2,12 @@
 #include <fstream>
 #include "../Utils/Logger/Logger.hpp"
 #include "../Utils/Timer.hpp"
-Uranium::ComponentParser::ComponentParser(): m_KeyGen(&this->m_Document) // even though Doc will have no data in it we have to invoke keygen so just wait till after construction
+#include "../memberComponentParsing/memberComponentParser.hpp"
+Uranium::ComponentParser::ComponentParser(): m_KeyGen(&this->m_Document) 
 {
 	std::ifstream file("schemas.json");
 	if (!file.is_open()) {
-		std::cerr << "Failed to open file." << std::endl;
+		Logs::Logger::Error("Failed to open schemas.json");
 	}
 
 	std::string jsonString((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -14,6 +15,7 @@ Uranium::ComponentParser::ComponentParser(): m_KeyGen(&this->m_Document) // even
 
 	m_Document.Parse(jsonString.c_str());
 	Run();
+	Logs::Logger::close();
 }
 
 void Uranium::ComponentParser::Run()
@@ -29,5 +31,21 @@ void Uranium::ComponentParser::Run()
 		Logs::Logger::Info("Highest Version Key: {}\nLongPrefix Key: {}\nShortPrefix Key: {}", key.highestVersionKey, key.longPrefix, key.shortPrefix);
 	}
 	Logs::Logger::Info("Generating component lists!");
+	MemberComponentParser memberComponentParser;
+	std::array<std::vector<MemberComponentData>, 3> memberComponentData = {};
+	for (int i = 0; i < highestVersionKeys.size(); i++) {
+		ScopedTimer timer("Generating component lists");
+		auto& componentRef = m_Document[highestVersionKeys[i].highestVersionKey.c_str()];
+		memberComponentData[i] = memberComponentParser.Parse(componentRef, highestVersionKeys[i]);
+	}
+	Logs::Logger::Info("Generated component lists!");
+	Logs::Logger::Info("Dumping component lists");
+	for (int i = 0; i < highestVersionKeys.size(); i++) {
+		Logs::Logger::Info("Dumping component list for version: {}", highestVersionKeys[i].highestVersionKey);
+		for (auto& member : memberComponentData[i])
+		{
+			Logs::Logger::Info("Name: {}\nExperimentals: {}\nKey: {}", member.Name, getExperimentalName(member.experiments), member.Key);
+		}
+	}
 
 }
