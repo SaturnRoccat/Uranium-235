@@ -30,12 +30,34 @@ project "Uranium_235"
         symbols "On"
 
     filter "configurations:Release"
-        defines { "NDEBUG" }
+        defines { "RELEASE" }
         optimize "On"
         symbols "On"
 
     vpaths {
         ["UraniumAPI/*"] = { "UraniumAPI/**.h", "UraniumAPI/**.cpp", "UraniumAPI/**.hpp" }
+    }
+
+project "Uranium-234"
+    architecture "x86_64"
+    kind "ConsoleApp"
+    language "C++"
+    targetdir "out/bin/Uranium-234/%{cfg.buildcfg}"
+    files { "Uranium-234/**.h", "Uranium-234/**.cpp", "Uranium-234/**.hpp" }
+    includedirs { "include/" } -- only exists for json parsing
+    filter "configurations:Debug"
+        defines { "DEBUG" }
+        symbols "On"
+        debugdir "out/bin/Uranium-234/%{cfg.buildcfg}"
+    
+    filter "configurations:Release"
+        defines { "RELEASE" }
+        optimize "On"
+        debugdir "out/bin/Uranium-234/%{cfg.buildcfg}"
+        symbols "On"
+
+    vpaths {
+        ["Uranium-234/*"] = { "Uranium-234/**.h", "Uranium-234/**.cpp", "Uranium-234/**.hpp" }
     }
 
 project "Uranium_235_tester"
@@ -50,21 +72,24 @@ project "Uranium_235_tester"
     files { "UraniumTester/**.h", "UraniumTester/**.cpp", "UraniumTester/**.hpp" }
 
     includedirs { "UraniumAPI", "include/" }
-
     links { "Uranium_235" }
-
-    -- force uranium_235 to allways build first
-    dependson { "Uranium_235" }
-
     platforms { "x86_64" } -- Screw 32 bit
 
     filter "configurations:Debug"
-        defines { "DEBUG" }
+        defines { "DEBUG", "BYPASSCHECKS" }
+        debugdir "out/bin/Uranium-234/%{cfg.buildcfg}"
         symbols "On"
 
     filter "configurations:Release"
-        defines { "NDEBUG" }
+        defines { "RELEASE" }
         optimize "On"
+        debugdir "out/bin/Uranium-234/%{cfg.buildcfg}"
+        symbols "On"
+
+    filter "configurations:UraniumReleaseDev"
+        defines { "RELEASE", "BYPASSCHECKS" }
+        optimize "On"
+        debugdir "out/bin/Uranium-234/%{cfg.buildcfg}"
         symbols "On"
 
     vpaths {
