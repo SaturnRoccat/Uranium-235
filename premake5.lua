@@ -43,8 +43,9 @@ project "Uranium-234"
     kind "ConsoleApp"
     language "C++"
     targetdir "out/bin/Uranium-234/%{cfg.buildcfg}"
+    cppdialect "C++20"
     files { "Uranium-234/**.h", "Uranium-234/**.cpp", "Uranium-234/**.hpp" }
-    includedirs { "include/" } -- only exists for json parsing
+    includedirs { "include/" } 
     filter "configurations:Debug"
         defines { "DEBUG" }
         symbols "On"

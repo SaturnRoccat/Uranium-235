@@ -1,7 +1,8 @@
 #include <iostream>
+#include "ComponentParser/ComponentParser.hpp"
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    Uranium::ComponentParser parser;
     return 0;
 }
