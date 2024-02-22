@@ -9,6 +9,14 @@
 
 namespace Uranium
 {
+	struct KeyInformation
+	{
+		std::string highestVersionKey;
+		std::string longPrefix;
+		std::string shortPrefix;
+
+	};
+
 	class KeyGenerator
 	{
 		rapidjson::Document* doc;
@@ -16,13 +24,13 @@ namespace Uranium
 		KeyGenerator(rapidjson::Document* doc) : doc(doc) {}
 
 		template<size_t expectedSize, size_t enddingTestSize = 1>
-		std::array<std::string, expectedSize> findHighestVersionKey(const std::array<std::string, expectedSize>& searchKeys, const std::array<std::string, enddingTestSize>& ends)
+		std::array<KeyInformation, expectedSize> findHighestVersionKey(const std::array<std::string, expectedSize>& searchKeys, const std::array<std::string, enddingTestSize>& ends, const std::string& longPrefixEndData = "components/")
 		{
 			if (doc == nullptr)
 				throw std::runtime_error("Document is null");
 			if (doc->IsObject() == false)
 				throw std::runtime_error("Document is not an object");
-			std::array<std::string, expectedSize> highestVersionKeys = {};
+			std::array<KeyInformation, expectedSize> highestVersionKeys = {};
 			for (auto& endData : ends)
 			{
 				size_t state = 0;
@@ -59,7 +67,11 @@ namespace Uranium
 
 
 					}
-					highestVersionKeys[state] = std::string(highestVersionKey);
+					KeyInformation keyInfo;
+					keyInfo.highestVersionKey = std::string(highestVersionKey);
+					keyInfo.longPrefix = SCHEMA_START + searchKey + highestVersion.toString() + "/" + longPrefixEndData;
+					keyInfo.shortPrefix = SCHEMA_START + searchKey;
+					highestVersionKeys[state] = keyInfo;
 					state++;
 					
 				}
@@ -67,7 +79,23 @@ namespace Uranium
 			return highestVersionKeys;
 		}
 
-
+		inline std::string resolveRefCallPath(std::string_view refCallPath,const std::string& longPath, const std::string& shortPath)
+		{
+			std::string returnData;
+			if (!refCallPath.ends_with(".json"))
+				throw std::runtime_error("Ref call path does not end with .json");
+			if (refCallPath.starts_with("../../"))
+			{
+				returnData = std::string(shortPath + refCallPath.substr(6, refCallPath.length() - 11).data());
+			}
+			else
+			{
+				if (!refCallPath.starts_with("./"))
+					throw std::runtime_error("Ref call path does not start with ./");
+				returnData = std::string(longPath + refCallPath.substr(2, refCallPath.length() - 7).data());
+			}
+			return returnData;
+		}
 	private:
 	};
 }
