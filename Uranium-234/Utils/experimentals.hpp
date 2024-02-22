@@ -6,14 +6,14 @@ namespace Uranium
 {
 	enum class Experimentals : unsigned char
 	{
+		None = 0,
 		HolidayCreatorFeatures,
 		CustomBiomes,
-		UpcomingCreatorFeatures = 2,
-		BetaAPIs = 4,
-		MoLangFeatures = 8,
-		ExperimentalCameras = 16,
-		VillagerTradeRebalancing = 32,
-		None = 0
+		UpcomingCreatorFeatures,
+		BetaAPIs,
+		MoLangFeatures,
+		ExperimentalCameras,
+		VillagerTradeRebalancing,
 
 	};
 
@@ -46,7 +46,7 @@ namespace Uranium
 		case Experimentals::VillagerTradeRebalancing:
 			return experimentalNames[6];
 		default:
-			return "Unknown";
+			return "None";
 		}
 	}
 
@@ -56,7 +56,7 @@ namespace Uranium
 		{
 			if (experimentalNames[i] == name)
 			{
-				return static_cast<Experimentals>(i);
+				return static_cast<Experimentals>(i + 1);
 			}
 		}
 		return Experimentals::HolidayCreatorFeatures;
