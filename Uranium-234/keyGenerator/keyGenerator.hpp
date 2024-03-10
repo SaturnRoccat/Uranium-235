@@ -84,7 +84,7 @@ namespace Uranium
 		{
 			std::string returnData;
 			if (!refCallPath.ends_with(".json"))
-				throw std::runtime_error("Ref call path does not end with .json");
+				Logs::Logger::Warning("Ref call path does not end with .json");
 			if (refCallPath.starts_with("../../"))
 			{
 				returnData = std::string(shortPath + refCallPath.substr(6, refCallPath.length() - 11).data());
@@ -96,6 +96,18 @@ namespace Uranium
 				returnData = std::string(longPath + refCallPath.substr(2, refCallPath.length() - 7).data());
 			}
 			return returnData;
+		}
+
+		static std::string parseGenericStringForLastNonJson(std::string_view genericString)
+		{
+			size_t lastSlash = genericString.find_last_of('/');
+			size_t lastDot = genericString.find_last_of('.');
+			if (lastSlash == std::string_view::npos )
+				throw std::runtime_error("Invalid generic string");
+			if (lastDot == std::string_view::npos)
+				lastDot = genericString.length(); // If there is no dot, then the last non json is the end of the string
+			std::string_view genericData = genericString.substr(lastSlash + 1, lastDot - lastSlash - 1);
+			return std::string(genericData);
 		}
 
 		static Experimentals resolveExperimentalData(std::string_view expString)

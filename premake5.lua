@@ -1,4 +1,4 @@
-workspace "UraniumAPI"
+workspace "Uranium"
     configurations { "Debug", "Release" }
     architecture "x64"
     location "solutions"

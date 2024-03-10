@@ -7,6 +7,7 @@
 #pragma warning(disable : 26451)
 #pragma warning(disable : 26495)
 #pragma warning(disable : 33010)
+#pragma warning(disable : 5232)
 #include <rapidjson/include/rapidjson/document.h>
 #include <rapidjson/include/rapidjson/istreamwrapper.h>
 #include <rapidjson/include/rapidjson/ostreamwrapper.h>
@@ -16,6 +17,7 @@
 #pragma warning(default : 4996)
 #pragma warning(default : 4267)
 #pragma warning(default : 26495)
+#pragma warning(default : 5232)
 #pragma warning(default : 33010)
 
 namespace RapidProxy

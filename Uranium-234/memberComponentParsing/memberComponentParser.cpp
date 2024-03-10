@@ -25,6 +25,7 @@ std::vector<Uranium::MemberComponentData> Uranium::MemberComponentParser::Parse(
 	return out;
 }
 
+
 void Uranium::MemberComponentParser::internalParse(const rapidjson::Value& parserTarget, const KeyInformation& keyInfo, std::vector<MemberComponentData>& out, Experimentals experimentalFlags)
 {
 	if (!parserTarget.HasMember("type"))
@@ -52,3 +53,127 @@ void Uranium::MemberComponentParser::internalParse(const rapidjson::Value& parse
 		out.push_back(data);
 	}
 }
+
+namespace Uranium {
+
+
+	void Uranium::MemberComponentParser::internalProccessObject(const rapidjson::Value& properties, CxxClass& out)
+	{
+		for (rapidjson::Value::ConstMemberIterator itr = properties.MemberBegin(); itr != properties.MemberEnd(); ++itr)
+		{
+			CxxType type;
+			std::string_view key = itr->name.GetString();
+			MemberComponentType guessedType = internalCalculateType(key.data(), itr->value);
+
+		}
+	}
+
+	MemberComponentType MemberComponentParser::internalCalculateType(const std::string& name, const rapidjson::Value& parserTarget)
+	{
+		MemberComponentType guessedType = MemberComponentType::Primitive;
+		if (name == "type")
+		{
+			auto enum_ = parserTarget.FindMember("enum");
+			if (enum_ != parserTarget.MemberEnd())
+				guessedType = MemberComponentType::Enum;
+			else
+				guessedType = MemberComponentType::Unknown;
+		}
+		else if (parserTarget.HasMember("enum"))
+		{
+			guessedType = MemberComponentType::Enum;
+		}
+		if (guessedType == MemberComponentType::Unknown)
+			Logs::Logger::Error("Unknown type for member: {}", name);
+		return guessedType;
+	}
+
+
+	std::vector<CxxClass> Uranium::MemberComponentParser::ParseMemberComponents(
+		const std::vector<MemberComponentData>& compData,
+		const rapidjson::Value& parserTarget,
+		const std::string& parent,
+		const std::string& namesp)
+	{
+		std::vector<CxxClass> out;
+		out.reserve(compData.size());
+		for (auto& comp : compData)
+		{
+			auto& data = parserTarget[comp.Key.c_str()];
+			auto parsed = ParseMemberComponent(comp, data, parent, namesp);
+			if (parsed.has_value())
+				out.push_back(parsed.value());
+		}
+	    
+		return out;
+	}
+
+	std::optional<CxxClass> Uranium::MemberComponentParser::ParseMemberComponent(
+		const MemberComponentData& compData,
+		const rapidjson::Value& parserTarget,
+		const std::string& parent,
+		const std::string& namesp)
+	{
+		if (!parserTarget.IsObject())
+		{
+			Logs::Logger::NonFatalError("Parser target is not an object in MemberComponentParser::ParseMemberComponent. Debugging Data\nKey: {}", compData.Key);
+			return std::nullopt;
+		}
+
+		auto dns = parserTarget.FindMember("doNotSuggest");
+		if (dns != parserTarget.MemberEnd())
+		{
+			if (dns->value.GetBool())
+				return std::nullopt;
+		}
+#ifdef DEBUG
+		Logs::Logger::Debug("Parsing member component: {}", compData.Name);
+		// dump json 
+		rapidjson::StringBuffer buffer;
+		rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+		parserTarget.Accept(writer);
+		Logs::Logger::Debug("Dumping json: {}", buffer.GetString());
+#endif
+
+		CxxClass out;
+		auto calculatedName = KeyGenerator::parseGenericStringForLastNonJson(compData.Key);
+		out.setName(calculatedName);
+		out.setParent(parent);
+		out.setNamespace(namesp);
+		out.addMemberForParent("\"" + calculatedName + "\"");
+
+		auto type = parserTarget.FindMember("type");
+		if (type == parserTarget.MemberEnd())
+		{
+			Logs::Logger::NonFatalError("No type member found in MemberComponentParser::ParseMemberComponent. Debugging Data\nKey: {}", compData.Key);
+			return std::nullopt;
+		}
+
+		if (!type->value.IsString())
+		{
+			Logs::Logger::NonFatalError("Type member is not a string in MemberComponentParser::ParseMemberComponent. Debugging Data\nKey: {}", compData.Key);
+			return std::nullopt;
+		}
+
+		if (type->value.GetString() == "object")
+		{
+			// stub
+		}
+		else if (type->value.GetString() == "array")
+		{
+			// stub
+		}
+		else
+		{
+			auto defaul = parserTarget.FindMember("default");
+			if (defaul != parserTarget.MemberEnd())
+				out.addMember(CxxType("m_" + calculatedName, type->value.GetString(), defaul->value.GetString()));
+			else
+				out.addMember(CxxType("m_" + calculatedName, type->value.GetString()));
+		}
+
+
+		out.printMembers();
+		return out;
+	}
+};

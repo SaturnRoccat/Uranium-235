@@ -15,7 +15,6 @@ Uranium::ComponentParser::ComponentParser(): m_KeyGen(&this->m_Document)
 
 	m_Document.Parse(jsonString.c_str());
 	Run();
-	Logs::Logger::close();
 }
 
 void Uranium::ComponentParser::Run()
@@ -24,7 +23,7 @@ void Uranium::ComponentParser::Run()
 	std::array<KeyInformation, 3> highestVersionKeys = {};
 	{
 		ScopedTimer timer("Finding most up to date keys");
-		highestVersionKeys = m_KeyGen.findHighestVersionKey<3, 1>(this->m_ComponentTypes, this->m_EndData);
+		highestVersionKeys = m_KeyGen.findHighestVersionKey<3, 1>(gComponentTypes, gEndData);
 	}
 	Logs::Logger::Info("Found most up to date keys!");
 	for (auto& key : highestVersionKeys) {
@@ -46,6 +45,12 @@ void Uranium::ComponentParser::Run()
 		{
 			Logs::Logger::Info("Name: {}\nExperimentals: {}\nKey: {}", member.Name, getExperimentalName(member.experiments), member.Key);
 		}
+	}
+	Logs::Logger::Info("Dumped component lists");
+	Logs::Logger::Info("Translating to Cxx");
+	for (int i = 0; i < highestVersionKeys.size(); i++) {
+		ScopedTimer timer("Translating to Cxx");
+		auto classes = memberComponentParser.ParseMemberComponents(memberComponentData[i], m_Document, gParents[i], "Uranium");
 	}
 
 }

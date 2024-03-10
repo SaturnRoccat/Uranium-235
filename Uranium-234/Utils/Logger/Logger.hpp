@@ -272,6 +272,11 @@ namespace Uranium
 				flush(true);
 				m_logFile.close();
 			}
+
+			~Logger()
+			{
+				close();
+			}
 		private:
 			static std::ofstream m_logFile;
 
