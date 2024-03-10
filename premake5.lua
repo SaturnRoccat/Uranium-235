@@ -2,6 +2,9 @@ workspace "Uranium"
     configurations { "Debug", "Release" }
     architecture "x64"
     location "solutions"
+    if os.target() == "linux" then
+        toolset "clang"
+    end
 
     
 
@@ -10,6 +13,9 @@ project "Uranium_235"
     kind "StaticLib"
     language "C++"
     targetdir "out/bin/Uranium_235/%{cfg.buildcfg}"
+    if os.target() == "linux" then
+        toolset "clang"
+    end
 
     -- include the include directory
     includedirs { "include/"}
@@ -60,6 +66,9 @@ project "Uranium-234"
     vpaths {
         ["Uranium-234/*"] = { "Uranium-234/**.h", "Uranium-234/**.cpp", "Uranium-234/**.hpp" }
     }
+    if os.target() == "linux" then
+        toolset "clang"
+    end
 
 project "Uranium_235_tester"
     architecture "x86_64"
