@@ -3,9 +3,4 @@
 
 namespace Uranium
 {
-	// Just a placeholder for now 
-	class CxxEnum : public CxxType
-	{
-
-	};
 }

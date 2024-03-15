@@ -29,28 +29,5 @@ void Uranium::ComponentParser::Run()
 	for (auto& key : highestVersionKeys) {
 		Logs::Logger::Info("Highest Version Key: {}\nLongPrefix Key: {}\nShortPrefix Key: {}", key.highestVersionKey, key.longPrefix, key.shortPrefix);
 	}
-	Logs::Logger::Info("Generating component lists!");
-	MemberComponentParser memberComponentParser;
-	std::array<std::vector<MemberComponentData>, 3> memberComponentData = {};
-	for (int i = 0; i < highestVersionKeys.size(); i++) {
-		ScopedTimer timer("Generating component lists");
-		auto& componentRef = m_Document[highestVersionKeys[i].highestVersionKey.c_str()];
-		memberComponentData[i] = memberComponentParser.Parse(componentRef, highestVersionKeys[i]);
-	}
-	Logs::Logger::Info("Generated component lists!");
-	Logs::Logger::Info("Dumping component lists");
-	for (int i = 0; i < highestVersionKeys.size(); i++) {
-		Logs::Logger::Info("Dumping component list for version: {}", highestVersionKeys[i].highestVersionKey);
-		for (auto& member : memberComponentData[i])
-		{
-			Logs::Logger::Info("Name: {}\nExperimentals: {}\nKey: {}", member.Name, getExperimentalName(member.experiments), member.Key);
-		}
-	}
-	Logs::Logger::Info("Dumped component lists");
-	Logs::Logger::Info("Translating to Cxx");
-	for (int i = 0; i < highestVersionKeys.size(); i++) {
-		ScopedTimer timer("Translating to Cxx");
-		auto classes = memberComponentParser.ParseMemberComponents(memberComponentData[i], m_Document, gParents[i], "Uranium");
-	}
 
 }
